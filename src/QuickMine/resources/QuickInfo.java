@@ -61,12 +61,72 @@ public class QuickInfo extends AbstractScript {
             iconX = 2+ iconSize;
             iconY = 2;
         }
+
+        buildFonts();
     }
 
     @Override
     public int onLoop() {
         //NOT CALLED CURRENTLY.
         return 50;
+    }
+
+    public Font[] Fonts;
+
+    public void buildFonts() {
+        Fonts = new Font[]{
+                new Font("Times New Roman", Font.BOLD, 16),
+                new Font("Times New Roman", Font.PLAIN, 14),
+                new Font("Default", Font.PLAIN, 12)
+        };
+    }
+
+    public int getAnimationDelay() {
+        if (Players.getLocal() == null) {
+            return 0;
+        }
+
+        return Players.getLocal().getAnimationDelay();
+    }
+
+    public void drawAnimationDelay(Graphics g, Boolean... animating) {
+        int animationDelay = getAnimationDelay();
+        g.setFont(Fonts[1]);
+
+        FontMetrics metrics = g.getFontMetrics(Fonts[1]);
+        int stringWidth = metrics.stringWidth("Animation Delay: ");
+
+        g.setColor(Color.gray);
+        g.drawString("Animation Delay: ", 4 , iconY - 8 - 14);
+        if (animating.length > 0) {
+            g.setColor(Color.green);
+        }
+        g.drawString("" + animationDelay, 4 + stringWidth , iconY - 8 - 14);
+
+    }
+
+    public int getAnimationID() {
+        if (Players.getLocal() == null) {
+            return -1;
+        }
+
+        return Players.getLocal().getAnimation();
+    }
+
+    public void drawAnimationID(Graphics g, Boolean... animating) {
+        int animationID = getAnimationID();
+        g.setFont(Fonts[1]);
+
+        FontMetrics metrics = g.getFontMetrics(Fonts[1]);
+        int stringWidth = metrics.stringWidth("Current Animation ID: ");
+
+        g.setColor(Color.gray);
+        g.drawString("Current Animation ID: ", 4 , iconY - 8);
+        if (animating.length > 0) {
+            g.setColor(Color.green);
+        }
+        g.drawString("" + animationID, 4 + stringWidth , iconY - 8);
+
     }
 
     @Override
@@ -79,9 +139,14 @@ public class QuickInfo extends AbstractScript {
             Player pl = Players.getLocal();
 
             if (pl != null) {
+                log("hi");
                 if (pl.isAnimating()) {
+                    drawAnimationDelay(g, true);
+                    drawAnimationID(g, true);
                     g.drawImage(Animating_Icon_Active, iconX, iconY, null);
                 } else {
+                    drawAnimationDelay(g);
+                    drawAnimationID(g);
                     g.drawImage(Animating_Icon, iconX, iconY, null);
                 }
             }
