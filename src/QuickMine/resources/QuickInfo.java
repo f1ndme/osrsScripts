@@ -139,7 +139,6 @@ public class QuickInfo extends AbstractScript {
             Player pl = Players.getLocal();
 
             if (pl != null) {
-                log("hi");
                 if (pl.isAnimating()) {
                     drawAnimationDelay(g, true);
                     drawAnimationID(g, true);

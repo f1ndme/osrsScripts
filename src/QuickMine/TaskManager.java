@@ -7,6 +7,7 @@ import QuickMine.tasks.QuickWalkTask;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.SkillTracker;
 import org.dreambot.api.methods.skills.Skills;
+import org.dreambot.api.script.TaskNode;
 import org.dreambot.api.script.impl.TaskScript;
 
 import java.awt.*;
@@ -63,6 +64,7 @@ public class TaskManager extends TaskScript {
                 SkillTracker.getGainedExperiencePerHour(Skill.MINING)
         );
 
+        g.setColor(Color.gray);
         g.drawString(miningLevel, 5, 55);
         g.drawString(experienceGainedText, 5, 70);
     }

@@ -12,6 +12,8 @@ import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.Player;
 
+import java.awt.*;
+
 public class MiningTask extends TaskNode {
 
     final int miningTolerance = 12;
