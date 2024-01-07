@@ -97,11 +97,11 @@ public class QuickInfo extends AbstractScript {
         int stringWidth = metrics.stringWidth("Animation Delay: ");
 
         g.setColor(Color.gray);
-        g.drawString("Animation Delay: ", 4 , iconY - 8 - 14);
+        g.drawString("Animation Delay: ", 4 , iconY - 12 - 14);
         if (animating.length > 0) {
             g.setColor(Color.green);
         }
-        g.drawString("" + animationDelay, 4 + stringWidth , iconY - 8 - 14);
+        g.drawString("" + animationDelay, 4 + stringWidth , iconY - 12 - 14);
 
     }
 
@@ -121,12 +121,90 @@ public class QuickInfo extends AbstractScript {
         int stringWidth = metrics.stringWidth("Current Animation ID: ");
 
         g.setColor(Color.gray);
-        g.drawString("Current Animation ID: ", 4 , iconY - 8);
+        g.drawString("Current Animation ID: ", 4 , iconY - 12);
         if (animating.length > 0) {
             g.setColor(Color.green);
         }
-        g.drawString("" + animationID, 4 + stringWidth , iconY - 8);
+        g.drawString("" + animationID, 4 + stringWidth , iconY - 12);
 
+    }
+
+    public void drawFacingDirection(Graphics g) {
+        Player pl = Players.getLocal();
+        g.setFont(Fonts[1]);
+
+        FontMetrics metrics = g.getFontMetrics(Fonts[1]);
+        int stringWidth = metrics.stringWidth("Currently Facing: ");
+
+        if (pl.isMoving()) {
+            g.setColor(Color.gray);
+            g.drawString("Currently Moving: ", iconX + iconSize + 4 , iconY + iconSize);
+            g.setColor(Color.green);
+        }else {
+            g.setColor(Color.gray);
+            g.drawString("Currently Facing: ", iconX + iconSize + 4 , iconY + iconSize);
+        }
+        g.drawString(" " + pl.getFacingDirection(), iconX + iconSize + 4 + stringWidth , iconY + iconSize);
+    }
+
+    public void drawCoordinates(Graphics g) {
+        Player pl = Players.getLocal();
+        int x = pl.getX();
+        int y = pl.getY();
+        g.setFont(Fonts[1]);
+
+        FontMetrics metrics = g.getFontMetrics(Fonts[1]);
+        int stringWidth = metrics.stringWidth("@ Coordinates:");
+
+        int previousStringWidth = metrics.stringWidth("Currently Facing:   " + pl.getFacingDirection());
+
+        //if (pl.isMoving()) {
+        //    g.setColor(Color.gray);
+        //    g.drawString("Walk Animation ID: ", iconX + iconSize + 4 , iconY + iconSize -14);
+        //    g.setColor(Color.green);
+        //}else {
+        g.setColor(Color.gray);
+        g.drawString("@ Coordinates: ", iconX + iconSize + 4 + previousStringWidth, iconY + iconSize);
+        //}
+        g.drawString(" (" + x + ", " + y + ")", iconX + iconSize + 4 + previousStringWidth + stringWidth , iconY + iconSize);
+    }
+
+    public void drawWalkingAnimation(Graphics g) {
+        Player pl = Players.getLocal();
+        int walkingAnimation = pl.getWalkAnimation();
+        g.setFont(Fonts[1]);
+
+        FontMetrics metrics = g.getFontMetrics(Fonts[1]);
+        int stringWidth = metrics.stringWidth("Walk Animation ID: ");
+
+        //if (pl.isMoving()) {
+        //    g.setColor(Color.gray);
+        //    g.drawString("Walk Animation ID: ", iconX + iconSize + 4 , iconY + iconSize -14);
+        //    g.setColor(Color.green);
+        //}else {
+            g.setColor(Color.gray);
+            g.drawString("Walk Animation ID: ", iconX + iconSize + 4 , iconY + iconSize -14);
+        //}
+        g.drawString(" " + walkingAnimation, iconX + iconSize + 4 + stringWidth , iconY + iconSize -14);
+    }
+
+    public void drawUserID(Graphics g) {
+        Player pl = Players.getLocal();
+        long userID = pl.getUID();
+        g.setFont(Fonts[1]);
+
+        FontMetrics metrics = g.getFontMetrics(Fonts[1]);
+        int stringWidth = metrics.stringWidth("Player ID: ");
+
+        //if (pl.isMoving()) {
+        //    g.setColor(Color.gray);
+        //    g.drawString("Walk Animation ID: ", iconX + iconSize + 4 , iconY + iconSize -14);
+        //    g.setColor(Color.green);
+        //}else {
+        g.setColor(Color.gray);
+        g.drawString("Player ID: ", iconX + iconSize + 4 , iconY + iconSize -28);
+        //}
+        g.drawString(" " + userID, iconX + iconSize + 4 + stringWidth , iconY + iconSize -28);
     }
 
     @Override
@@ -139,6 +217,12 @@ public class QuickInfo extends AbstractScript {
             Player pl = Players.getLocal();
 
             if (pl != null) {
+                log(pl.getQueueX()[1]);
+                drawFacingDirection(g);
+                drawWalkingAnimation(g);
+                drawUserID(g);
+                drawCoordinates(g);
+
                 if (pl.isAnimating()) {
                     drawAnimationDelay(g, true);
                     drawAnimationID(g, true);
