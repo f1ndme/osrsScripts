@@ -10,7 +10,7 @@ import java.awt.*;
 
 import static QuickMine.resources.ENUMS.PRIORITY.*;
 
-@ScriptManifest(category = Category.MINING, name = "Quick Miwwne 2.0", description = "Mines stuff.", author = "find me", version = 1.0)
+@ScriptManifest(category = Category.MINING, name = "Quick Mine 2.0", description = "Mines stuff.", author = "find me", version = 1.0)
 public class Main extends AbstractScript {
     QuickTime quickTime;
     QuickInfo quickInfo;
