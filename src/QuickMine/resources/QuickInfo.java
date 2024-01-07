@@ -2,6 +2,7 @@ package QuickMine.resources;
 
 import org.dreambot.api.Client;
 import org.dreambot.api.methods.interactive.Players;
+import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.script.AbstractScript;
 import org.dreambot.api.wrappers.interactive.Character;
 import org.dreambot.api.wrappers.interactive.Player;
@@ -78,6 +79,7 @@ public class QuickInfo extends AbstractScript {
         Fonts = new Font[]{
                 new Font("Times New Roman", Font.BOLD, 16),
                 new Font("Times New Roman", Font.PLAIN, 14),
+                new Font("Times New Roman", Font.BOLD, 14),
                 new Font("Default", Font.PLAIN, 12)
         };
     }
@@ -121,13 +123,16 @@ public class QuickInfo extends AbstractScript {
         FontMetrics metrics = g.getFontMetrics(Fonts[1]);
         int stringWidth = metrics.stringWidth("Current Animation ID: ");
 
-        g.setColor(Color.gray);
-        g.drawString("Current Animation ID: ", 4 , iconY - 12);
+
         if (animating.length > 0) {
+            g.setColor(Color.white);
+            g.drawString("Current Animation ID: ", 4 , iconY - 12);
             g.setColor(Color.green);
+        }else {
+            g.setColor(Color.gray);
+            g.drawString("Current Animation ID: ", 4 , iconY - 12);
         }
         g.drawString("" + animationID, 4 + stringWidth , iconY - 12);
-
     }
 
     public void drawFacingDirection(Graphics g) {
@@ -135,15 +140,25 @@ public class QuickInfo extends AbstractScript {
         g.setFont(Fonts[1]);
 
         FontMetrics metrics = g.getFontMetrics(Fonts[1]);
-        int stringWidth = metrics.stringWidth("Currently Facing: ");
+
+        String intermediateText;
+        if (pl.isStandingStill()) {
+            intermediateText = "Facing";
+        }else if (Walking.isRunEnabled()) {
+            intermediateText = "Running";
+        }else {
+            intermediateText = "Walking";
+        }
+
+        int stringWidth = metrics.stringWidth("Currently " + intermediateText + ": ");
 
         if (pl.isMoving()) {
-            g.setColor(Color.gray);
-            g.drawString("Currently Moving: ", iconX + iconSize + 4 , iconY + iconSize);
+            g.setColor(Color.white);
+            g.drawString("Currently " + intermediateText + ": ", iconX + iconSize + 4 , iconY + iconSize);
             g.setColor(Color.green);
         }else {
             g.setColor(Color.gray);
-            g.drawString("Currently Facing: ", iconX + iconSize + 4 , iconY + iconSize);
+            g.drawString("Currently " + intermediateText + ": ", iconX + iconSize + 4 , iconY + iconSize);
         }
         g.drawString(" " + pl.getFacingDirection(), iconX + iconSize + 4 + stringWidth , iconY + iconSize);
     }
@@ -154,10 +169,19 @@ public class QuickInfo extends AbstractScript {
         int y = pl.getY();
         g.setFont(Fonts[1]);
 
+        String intermediateText;
+        if (pl.isStandingStill()) {
+            intermediateText = "Facing";
+        }else if (Walking.isRunEnabled()) {
+            intermediateText = "Running";
+        }else {
+            intermediateText = "Walking";
+        }
+
         FontMetrics metrics = g.getFontMetrics(Fonts[1]);
         int stringWidth = metrics.stringWidth("@ Coordinates:");
 
-        int previousStringWidth = metrics.stringWidth("Currently Facing: " + pl.getFacingDirection());
+        int previousStringWidth = metrics.stringWidth("Currently " + intermediateText + ": " + pl.getFacingDirection());
 
         g.setColor(Color.gray);
         g.drawString("@ Coordinates: ", iconX + iconSize + 12 + previousStringWidth, iconY + iconSize);
@@ -217,10 +241,16 @@ public class QuickInfo extends AbstractScript {
         int previousStringWidth = metrics.stringWidth("Player ID: " + pl.getUID());
 
         g.setColor(Color.gray);
+        if (pl.isInteracting(interactingCharacter)) {
+            g.setColor(Color.white);
+        }
         g.drawString("Interacting ID: ", iconX + iconSize + 12 + previousStringWidth , iconY + iconSize -28);
 
         if (pl.isInteracting(interactingCharacter)) {
             g.setColor(Color.green);
+            if (pl.isInCombat()) {
+                g.setColor(Color.red);
+            }
         }
         g.drawString("" + interactingID, iconX + iconSize + 12 + previousStringWidth + stringWidth , iconY + iconSize -28);
     }
@@ -230,16 +260,30 @@ public class QuickInfo extends AbstractScript {
         Character interactingCharacter = pl.getInteractingCharacter();
         g.setFont(Fonts[1]);
 
+        String intermediateText;
+        if (pl.isInCombat()) {
+            intermediateText = "Fighting";
+        }else {
+            intermediateText = "Interacting";
+        }
+
         FontMetrics metrics = g.getFontMetrics(Fonts[1]);
-        int stringWidth = metrics.stringWidth("Interacting with: ");
+        int stringWidth = metrics.stringWidth(intermediateText + " with: ");
 
         int previousStringWidth = metrics.stringWidth("Player ID: " + pl.getUID() + "Interacting ID: " + pl.getInteractingIndex());
 
         g.setColor(Color.gray);
-        g.drawString("Interacting with: ", iconX + iconSize + 20 + previousStringWidth , iconY + iconSize -28);
+        if (pl.isInteracting(interactingCharacter)) {
+            g.setColor(Color.white);
+        }
+
+        g.drawString(intermediateText + " with: ", iconX + iconSize + 20 + previousStringWidth , iconY + iconSize -28);
 
         if (pl.isInteracting(interactingCharacter)) {
             g.setColor(Color.green);
+            if (pl.isInCombat()) {
+                g.setColor(Color.red);
+            }
             g.drawString("" + interactingCharacter.getName(), iconX + iconSize + 20 + previousStringWidth + stringWidth , iconY + iconSize -28);
         }
     }
