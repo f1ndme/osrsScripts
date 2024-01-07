@@ -298,7 +298,7 @@ public class QuickInfo extends AbstractScript {
             Player pl = Players.getLocal();
 
             if (pl != null) {
-                log(pl.getQueueX()[1]);
+                //log(pl.getQueueX()[1]);
                 drawFacingDirection(g);
                 drawCoordinates(g);
                 drawWalkingAnimation(g);
