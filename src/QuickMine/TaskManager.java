@@ -55,12 +55,12 @@ public class TaskManager extends TaskScript {
     @Override
     public void onPaint(Graphics g) {
         String miningLevel = String.format(
-                "Mining Level: %d", // The paint's text format. '%d' will be replaced with the next two arguments.
+                "Mining Level: %d",
                 Skills.getRealLevel(Skill.MINING)
         );
 
         String experienceGainedText = String.format(
-                "Mining Experience: %d (%d per hour)", // The paint's text format. '%d' will be replaced with the next two arguments.
+                "Mining Experience: %d (%d per hour)",
                 SkillTracker.getGainedExperience(Skill.MINING),
                 SkillTracker.getGainedExperiencePerHour(Skill.MINING)
         );
@@ -69,5 +69,4 @@ public class TaskManager extends TaskScript {
         g.drawString(miningLevel, 5, 55);
         g.drawString(experienceGainedText, 5, 70);
     }
-
 }
