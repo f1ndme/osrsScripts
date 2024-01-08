@@ -18,12 +18,14 @@ public class TaskManager extends TaskScript {
 
     @Override
     public void onStart() {
-        SkillTracker.start(Skill.MINING);
 
-        setPriority(JUSTGO);
     }
 
     public void onSetup(Priority... priorities) {
+        SkillTracker.start(Skill.MINING);
+
+        setPriority(JUSTGO);
+
         if (priorities.length > 0) {
             priority = priorities[0];
         } else {
