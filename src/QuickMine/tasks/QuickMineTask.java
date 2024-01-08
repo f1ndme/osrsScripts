@@ -5,6 +5,7 @@ import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
+import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.script.TaskNode;
 import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
@@ -14,17 +15,21 @@ import static QuickMine.resources.Enums.Ores.allMineableOres;
 import static QuickMine.resources.Enums.Pickaxes.hasUsablePickaxe;
 
 public class QuickMineTask extends TaskNode {
-
     final int miningTolerance = 6;
 
     Player pl;
     GameObject attemptingOre;
+    Tile playerTile;
 
     @Override
     public boolean accept() {
         pl = Players.getLocal();
+        if (pl == null) return false;
 
-        return hasUsablePickaxe() && !Inventory.isFull() && !isMining() && (pl != null) && !pl.isMoving();
+        playerTile = pl.getTile();
+        if (playerTile == null) return false;
+
+        return hasUsablePickaxe() && !Inventory.isFull() && !isMining() && !pl.isMoving();
     }
 
     @Override
@@ -55,7 +60,7 @@ public class QuickMineTask extends TaskNode {
     }
 
     private GameObject getClosestMinableOre() {
-            for (int i = allMineableOres().size(); i-- > 0; ) { //backwards iterate gets top ore first. cheeky
+            for (int i = allMineableOres().size(); i-- > 0; ) {
                 Ores ore = allMineableOres().get(i);
 
                 GameObject obj = GameObjects.closest(object -> object.getName().equalsIgnoreCase(ore.name) &&

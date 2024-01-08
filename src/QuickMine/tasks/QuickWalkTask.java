@@ -42,11 +42,13 @@ public class QuickWalkTask extends TaskNode {
     @Override
     public boolean accept() {
         pl = Players.getLocal();
+        if (pl == null) return false;
+
         if (selectedLocation == null) {
             chooseStartingArea();
         }
 
-        return (pl != null) && !selectedLocation.area.contains(pl.getTile());
+        return !selectedLocation.area.contains(pl.getTile());
     }
 
     @Override
