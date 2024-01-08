@@ -1,15 +1,11 @@
 package QuickMine.resources;
 
 import org.dreambot.api.Client;
-import org.dreambot.api.script.AbstractScript;
-import org.dreambot.api.script.Category;
-import org.dreambot.api.script.ScriptManifest;
 import org.dreambot.api.utilities.Timer;
 
 
 import java.awt.*;
 
-@ScriptManifest(category = Category.UTILITY, name = "Quick Time", author = "find me", version = 1.1)
 public class QuickTime {
 
     public Timer Time;
