@@ -1,21 +1,20 @@
 package QuickMine;
 
-import QuickMine.resources.ENUMS.*;
+import QuickMine.resources.Enums.*;
 import QuickMine.tasks.DropInventoryTask;
 import QuickMine.tasks.QuickMineTask;
 import QuickMine.tasks.QuickWalkTask;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.SkillTracker;
 import org.dreambot.api.methods.skills.Skills;
-import org.dreambot.api.script.TaskNode;
 import org.dreambot.api.script.impl.TaskScript;
 
 import java.awt.*;
 
-import static QuickMine.resources.ENUMS.PRIORITY.JUSTGO;
+import static QuickMine.resources.Enums.Priority.JUSTGO;
 
 public class TaskManager extends TaskScript {
-    public PRIORITY priority;
+    public Priority priority;
 
     @Override
     public void onStart() {
@@ -24,7 +23,7 @@ public class TaskManager extends TaskScript {
         setPriority(JUSTGO);
     }
 
-    public void onSetup(PRIORITY... priorities) {
+    public void onSetup(Priority... priorities) {
         if (priorities.length > 0) {
             priority = priorities[0];
         } else {
@@ -34,7 +33,7 @@ public class TaskManager extends TaskScript {
         setPriority(priority);
     }
 
-    public void setPriority(PRIORITY priority) {
+    public void setPriority(Priority priority) {
         switch (priority) {
             case JUSTGO:
                 addNodes(new QuickWalkTask(), new QuickMineTask(), new DropInventoryTask());

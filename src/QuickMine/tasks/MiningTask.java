@@ -1,18 +1,16 @@
 package QuickMine.tasks;
 
-import QuickMine.resources.ENUMS;
+import QuickMine.resources.Enums.Ores;
+import QuickMine.resources.Enums.Pickaxes;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
-import org.dreambot.api.methods.skills.Skill;
-import org.dreambot.api.methods.skills.Skills;
+import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.script.TaskNode;
 import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.Player;
-
-import java.awt.*;
 
 public class MiningTask extends TaskNode {
 
@@ -20,27 +18,30 @@ public class MiningTask extends TaskNode {
 
     Player pl;
     int miningLevel;
-    ENUMS.ORE highestMinableOre;
+    Ores highestMinableOre;
     GameObject attemptingOre;
+    Tile playerTile;
 
     @Override
     public boolean accept() {
-        miningLevel = Skills.getRealLevel(Skill.MINING);
-        highestMinableOre = ENUMS.ORE.highestMinable(miningLevel);
-        attemptingOre = getClosestOre(highestMinableOre.name);
         pl = Players.getLocal();
+        playerTile = pl.getTile();
+        if (pl == null || playerTile == null) return false;
 
-        boolean hasHighestUsable = ENUMS.PICKAXE.hasHighestUsable(miningLevel);
-        boolean nearHighestMinable = getClosestOre(highestMinableOre.name).distance(Players.getLocal().getTile()) <= miningTolerance;
-        boolean playerNull = (pl == null);
+        if (!Pickaxes.hasHighestUsablePickaxe()) return false;
+        highestMinableOre = Ores.highestMineableOre();
 
-        return !Inventory.isFull() && !isMining() && hasHighestUsable && nearHighestMinable && !playerNull;
+        attemptingOre = getClosestOre(highestMinableOre.name);
+        if (attemptingOre == null) return false;
+
+        boolean nearHighestMinable = attemptingOre.distance(playerTile) <= miningTolerance;
+        if (!nearHighestMinable) return false;
+
+        return !Inventory.isFull() && !isMining();
     }
 
     @Override
     public int execute() {
-        if (attemptingOre == null) return Calculations.random(300, 600);
-
         if (attemptingOre.interact("Mine")) {
             Sleep.sleepUntil(this::isMining, 4200);
         }

@@ -1,19 +1,17 @@
 package QuickMine.tasks;
 
-import QuickMine.resources.ENUMS.*;
+import QuickMine.resources.Enums.*;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
-import org.dreambot.api.methods.skills.Skill;
-import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.script.TaskNode;
 import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.Player;
 
-import static QuickMine.resources.ENUMS.ORE.getAllMinable;
-import static QuickMine.resources.ENUMS.PICKAXE.hasUsablePickaxe;
+import static QuickMine.resources.Enums.Ores.allMineableOres;
+import static QuickMine.resources.Enums.Pickaxes.hasUsablePickaxe;
 
 public class QuickMineTask extends TaskNode {
 
@@ -57,8 +55,8 @@ public class QuickMineTask extends TaskNode {
     }
 
     private GameObject getClosestMinableOre() {
-            for (int i = getAllMinable(Skills.getRealLevel(Skill.MINING)).size(); i-- > 0; ) { //backwards iterate gets top ore first. cheeky
-                ORE ore = getAllMinable(Skills.getRealLevel(Skill.MINING)).get(i);
+            for (int i = allMineableOres().size(); i-- > 0; ) { //backwards iterate gets top ore first. cheeky
+                Ores ore = allMineableOres().get(i);
 
                 GameObject obj = GameObjects.closest(object -> object.getName().equalsIgnoreCase(ore.name) &&
                         object.hasAction("Mine") &&

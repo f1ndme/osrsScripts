@@ -2,8 +2,6 @@ package QuickMine.tasks;
 
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Tile;
-import org.dreambot.api.methods.skills.Skill;
-import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.methods.walking.path.impl.GlobalPath;
 import org.dreambot.api.methods.walking.pathfinding.impl.web.WebPathQuery;
@@ -17,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static QuickMine.resources.ENUMS.*;
+import static QuickMine.resources.Enums.*;
 
 public class QuickWalkTask extends TaskNode {
     final int swagger = 5;
@@ -35,7 +33,7 @@ public class QuickWalkTask extends TaskNode {
     Player pl;
     int index;
 
-    LOCATION selectedLocation;
+    Locations selectedLocation;
     Tile selectedDestination;
 
 
@@ -48,7 +46,7 @@ public class QuickWalkTask extends TaskNode {
             chooseStartingArea();
         }
 
-        return (pl != null) && !selectedLocation.location.contains(pl.getTile());
+        return (pl != null) && !selectedLocation.area.contains(pl.getTile());
     }
 
     @Override
@@ -63,13 +61,13 @@ public class QuickWalkTask extends TaskNode {
     }
 
     private void chooseStartingArea() {
-        List<ORE> minableOres = ORE.getAllMinable(Skills.getRealLevel(Skill.MINING));
+        List<Ores> minableOres = Ores.allMineableOres();
 
-        ORE randomOre = Collections.unmodifiableList(minableOres).get(new Random().nextInt(Collections.unmodifiableList(minableOres).size()));
+        Ores randomOre = Collections.unmodifiableList(minableOres).get(new Random().nextInt(Collections.unmodifiableList(minableOres).size()));
         int randomKey = new Random().nextInt(randomOre.locations.size());
 
         selectedLocation = randomOre.locations.get(randomKey);
-        selectedDestination = selectedLocation.location.getRandomTile(); //random area, random tile
+        selectedDestination = selectedLocation.area.getRandomTile(); //random area, random tile
         log("Ore selected to mine near: " + randomOre.name + ". Location selected to mine: " + selectedLocation + ".");
 
         startWalk(selectedDestination);

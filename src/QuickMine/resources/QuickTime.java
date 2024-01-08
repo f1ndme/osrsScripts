@@ -10,7 +10,7 @@ import org.dreambot.api.utilities.Timer;
 import java.awt.*;
 
 @ScriptManifest(category = Category.UTILITY, name = "Quick Time", author = "find me", version = 1.1)
-public class QuickTime extends AbstractScript {
+public class QuickTime {
 
     public Timer Time;
     public Timer PauseTime;
@@ -18,8 +18,8 @@ public class QuickTime extends AbstractScript {
     public String[] PauseReason;
     public int CurrentPauseReason;
 
-    @Override
-    public void onStart() {
+
+    public void setup() {
         Time = new Timer(); //initialize Script Timer
 
         Fonts = new Font[]{
@@ -34,8 +34,7 @@ public class QuickTime extends AbstractScript {
         };
     }
 
-    @Override
-    public int onLoop() {
+    public void onLoop() {
         if (!Client.isLoggedIn()) {
             if (!Time.isPaused()) {
                 CurrentPauseReason = 0;
@@ -47,19 +46,15 @@ public class QuickTime extends AbstractScript {
                 PauseTime.reset();
             }
 
-            return 1000;
+            return;
         }
 
         if (Time.isPaused()) {
             Time.resume();
         }
-
-        return 50;
     }
 
 
-
-    @Override
     public void onPause() {
         if (!Time.isPaused()) {
             CurrentPauseReason = 1;
@@ -72,7 +67,6 @@ public class QuickTime extends AbstractScript {
         }
     }
 
-    @Override
     public void onResume() {
         if (!Client.isLoggedIn()) {CurrentPauseReason = 0; return;}
         if (Time.isPaused()) {Time.resume();}
@@ -92,7 +86,7 @@ public class QuickTime extends AbstractScript {
     public boolean LoginState;
 
     public boolean ResolutionChange() {
-        return LastScreenSize != Client.getViewportWidth() + Client.getViewportHeight();
+        return LastScreenSize != (Client.getViewportWidth() ^ Client.getViewportHeight());
     }
 
     public boolean LoginStateChange() {
@@ -111,7 +105,7 @@ public class QuickTime extends AbstractScript {
         ScrW = Client.getViewportWidth();
         ScrH = Client.getViewportHeight();
 
-        LastScreenSize = ScrW+ScrH;
+        LastScreenSize = ScrW ^ ScrH;
 
         FrameWidth = 184;
         FrameHeight = 24;
@@ -128,7 +122,7 @@ public class QuickTime extends AbstractScript {
         }
     }
 
-    @Override
+
     public void onPaint(Graphics g) {
         if (FrameColor == null || ResolutionChange() || LoginStateChange()) { //Replace null check.
             SetupUI();

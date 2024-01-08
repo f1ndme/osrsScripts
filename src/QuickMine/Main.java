@@ -8,7 +8,7 @@ import org.dreambot.api.script.ScriptManifest;
 
 import java.awt.*;
 
-import static QuickMine.resources.ENUMS.PRIORITY.*;
+import static QuickMine.resources.Enums.Priority.*;
 
 @ScriptManifest(category = Category.MINING, name = "Quick Mine 2.0", description = "Mines stuff.", author = "find me", version = 1.0)
 public class Main extends AbstractScript {
@@ -20,10 +20,9 @@ public class Main extends AbstractScript {
     @Override
     public void onStart() {
         quickTime = new QuickTime();
-        quickTime.onStart();
+        quickTime.setup();
 
         quickInfo = new QuickInfo();
-        quickInfo.onStart();
 
         taskManager = new TaskManager();
         taskManager.onStart();

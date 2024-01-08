@@ -8,20 +8,20 @@ import org.dreambot.api.methods.skills.Skills;
 
 import java.util.*;
 
-public class ENUMS {
+public class Enums {
 
-    public enum PRIORITY { JUSTGO, EXPERIENCE, GOLD }
+    public enum Priority { JUSTGO, EXPERIENCE, GOLD }
 
-    public enum RESOURCE {
+    public enum Resources {
         SOURCE("findme/"),
         IMAGES("images/");
 
         public final String dir;
 
-        RESOURCE(String dir) { this.dir = dir; };
+        Resources(String dir) { this.dir = dir; };
     }
 
-    public enum LOCATION {
+    public enum Locations {
         COPPER_LUMBRIDGE(new Area(3227, 3149, 3231, 3145)),
         COPPER_RIMMINGTON(new Area(2975, 3248, 2980, 3244)),
         TIN_LUMBRIDGE(new Area(3223, 3149, 3226, 3145)),
@@ -34,67 +34,68 @@ public class ENUMS {
         MITHRIL_DRAYNOR(new Area(3144, 3147, 3148, 3144)),
         ADAMANT_DRAYNOR(new Area(3146, 3148, 3149, 3145));
 
-        public final Area location;
+        public final Area area;
 
-        LOCATION(Area location) {
-            this.location = location;
+        Locations(Area area) {
+            this.area = area;
         }
 
-        public static LOCATION random() {
+        public static Locations randomArea() {
             return Collections.unmodifiableList(Arrays.asList(values())).get(new Random().nextInt(Collections.unmodifiableList(Arrays.asList(values())).size()));
         }
     }
 
 
-    public enum ORE {
-        COPPER("Copper rocks", 1, Arrays.asList(LOCATION.COPPER_LUMBRIDGE, LOCATION.COPPER_RIMMINGTON) ),
-        TIN("Tin rocks", 1, Arrays.asList(LOCATION.TIN_LUMBRIDGE, LOCATION.TIN_RIMMINGTON) ),
-        CLAY("Clay rocks", 1, Arrays.asList(LOCATION.CLAY_RIMMINGTON, LOCATION.CLAY_RIMMINGTON) ),
-        IRON("Iron rocks", 15, Arrays.asList(LOCATION.IRON_RIMMINGTON, LOCATION.IRON2_RIMMINGTON) ),
-        COAL("Coal rocks", 30, Arrays.asList(LOCATION.COAL_DRAYNOR, LOCATION.COAL_DRAYNOR) ),
-        GOLD("Gold rocks", 40, Arrays.asList(LOCATION.GOLD_RIMMINGTON, LOCATION.GOLD_RIMMINGTON) ),
-        MITHRIL("Mithril rocks", 55, Arrays.asList(LOCATION.MITHRIL_DRAYNOR, LOCATION.MITHRIL_DRAYNOR) ),
-        ADAMANT("Adamant rocks", 70, Arrays.asList(LOCATION.ADAMANT_DRAYNOR, LOCATION.ADAMANT_DRAYNOR) );
+    public enum Ores {
+        COPPER("Copper rocks", 1, Arrays.asList(Locations.COPPER_LUMBRIDGE, Locations.COPPER_RIMMINGTON) ),
+        TIN("Tin rocks", 1, Arrays.asList(Locations.TIN_LUMBRIDGE, Locations.TIN_RIMMINGTON) ),
+        CLAY("Clay rocks", 1, Arrays.asList(Locations.CLAY_RIMMINGTON, Locations.CLAY_RIMMINGTON) ),
+        IRON("Iron rocks", 15, Arrays.asList(Locations.IRON_RIMMINGTON, Locations.IRON2_RIMMINGTON) ),
+        COAL("Coal rocks", 30, Arrays.asList(Locations.COAL_DRAYNOR, Locations.COAL_DRAYNOR) ),
+        GOLD("Gold rocks", 40, Arrays.asList(Locations.GOLD_RIMMINGTON, Locations.GOLD_RIMMINGTON) ),
+        MITHRIL("Mithril rocks", 55, Arrays.asList(Locations.MITHRIL_DRAYNOR, Locations.MITHRIL_DRAYNOR) ),
+        ADAMANT("Adamant rocks", 70, Arrays.asList(Locations.ADAMANT_DRAYNOR, Locations.ADAMANT_DRAYNOR) );
 
         public final String name;
         public final int level;
-        public final List<LOCATION> locations;
+        public final List<Locations> locations;
 
-        ORE(String name, int level, List<LOCATION> location) {
+        Ores(String name, int level, List<Locations> location) {
             this.name = name;
             this.level = level;
             this.locations = location;
         }
 
-        public static ORE random() {
+        public static Ores randomOre() {
             return Collections.unmodifiableList(Arrays.asList(values())).get(new Random().nextInt(Collections.unmodifiableList(Arrays.asList(values())).size()));
         }
 
-        public static ORE highestMinable(int miningLevel) {
-            ORE lastOre = ORE.TIN;
+        public static Ores highestMineableOre() {
+            Ores lastOre = Ores.COPPER; //consider multiple ores @ same level, return random of?
 
-            for (ORE ore : ORE.values()) {
-                if (miningLevel < lastOre.level) return lastOre;
+            for (Ores ore : Ores.values()) {
+                if (Skills.getRealLevel(Skill.MINING) < lastOre.level) return lastOre;
+
                 lastOre = ore;
             }
 
             return lastOre;
         }
 
-        public static List<ORE> getAllMinable(int miningLevel) {
-            List<ORE> Ores = new ArrayList<>();
+        public static List<Ores> allMineableOres() {
+            List<Ores> oreList = new ArrayList<>();
 
-            for (ORE ore : ORE.values()) {
-                if (miningLevel >= ore.level) {
-                    Ores.add(ore);
+            for (Ores ore : Ores.values()) {
+                if (Skills.getRealLevel(Skill.MINING) >= ore.level) {
+                    oreList.add(ore);
                 }
             }
 
-            return Ores;
+            return oreList;
         }
     }
 
-    public enum PICKAXE {
+    public enum Pickaxes {
         BRONZE("Bronze pickaxe", 1),
         IRON("Iron pickaxe", 1),
         STEEL("Steel pickaxe", 6),
@@ -110,33 +111,35 @@ public class ENUMS {
         public final String name;
         public final int level;
 
-        PICKAXE(String name, int level) {
+        Pickaxes(String name, int level) {
             this.name = name;
             this.level = level;
         }
-        public static PICKAXE random() {
+        public static Pickaxes randomPickaxe() {
             return Collections.unmodifiableList(Arrays.asList(values())).get(new Random().nextInt(Collections.unmodifiableList(Arrays.asList(values())).size()));
         }
 
-        public static PICKAXE getHighestUsable(int miningLevel) {
-            PICKAXE lastPickaxe = PICKAXE.BRONZE;
-            for (PICKAXE pickaxe : PICKAXE.values()) {
-                if (miningLevel < pickaxe.level) return lastPickaxe;
+        public static Pickaxes highestUsablePickaxe() { //NO MINING LEVEL SETUP FOR USE YET
+            Pickaxes lastPickaxe = Pickaxes.BRONZE;
+
+            for (Pickaxes pickaxe : Pickaxes.values()) {
+                if (Skills.getRealLevel(Skill.MINING) < pickaxe.level) return lastPickaxe;
                 lastPickaxe = pickaxe;
             }
 
             return lastPickaxe;
         }
 
-        public static boolean hasHighestUsable(int miningLevel) {
-            PICKAXE highestUsable = getHighestUsable(miningLevel);
+        public static boolean hasHighestUsablePickaxe() { //NO MINING LEVEL SETUP FOR USE YET
+            Pickaxes highestUsable = highestUsablePickaxe();
 
             return (Equipment.contains(highestUsable) || Inventory.contains(highestUsable));
         }
 
         public static boolean hasUsablePickaxe() {
-            for (PICKAXE pickaxe : PICKAXE.values()) {
+            for (Pickaxes pickaxe : Pickaxes.values()) {
                 String name = pickaxe.name;
+
                 if (Equipment.contains(name) || Inventory.contains(name))
                 {
                     if (Skills.getRealLevel(Skill.MINING) >= pickaxe.level) return true;
