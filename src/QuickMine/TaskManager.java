@@ -30,9 +30,6 @@ public class TaskManager extends TaskScript {
         setPriority(priority);
     }
 
-    @Override
-    public void onStart() {}
-
     public void setPriority(Priority priority) {
         switch (priority) {
             case JUSTGO:
@@ -49,6 +46,9 @@ public class TaskManager extends TaskScript {
                 break;
         }
     }
+
+    @Override
+    public void onStart() {}
 
     @Override
     public void onPaint(Graphics g) {
