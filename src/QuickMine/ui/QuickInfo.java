@@ -1,5 +1,6 @@
-package QuickMine.resources;
+package QuickMine.ui;
 
+import QuickMine.resources.Enums;
 import org.dreambot.api.Client;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.walking.impl.Walking;

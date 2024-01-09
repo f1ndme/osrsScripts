@@ -1,7 +1,7 @@
 package QuickMine;
 
-import QuickMine.resources.QuickInfo;
-import QuickMine.resources.QuickTime;
+import QuickMine.ui.QuickInfo;
+import QuickMine.ui.QuickTime;
 import org.dreambot.api.script.AbstractScript;
 import org.dreambot.api.script.Category;
 import org.dreambot.api.script.ScriptManifest;
@@ -19,8 +19,7 @@ public class Main extends AbstractScript {
 
     @Override
     public void onStart() {
-        quickTime = new QuickTime();
-        quickTime.setup();
+        quickTime = new QuickTime(getRandomManager());
 
         quickInfo = new QuickInfo();
 
