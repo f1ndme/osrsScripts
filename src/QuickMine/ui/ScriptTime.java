@@ -9,7 +9,7 @@ import java.awt.*;
 import static QuickMine.resources.Functions.cantorPairing;
 
 
-public class QuickTime {
+public class ScriptTime {
     public Timer runTime;
     public Timer pausedTime;
     public Font[] fonts;
@@ -17,7 +17,7 @@ public class QuickTime {
     public int currentPauseReason;
     public RandomManager randomManager;
 
-    public QuickTime(RandomManager manager) {
+    public ScriptTime(RandomManager manager) {
         this.randomManager = manager;
 
         runTime = new Timer(); //initialize Script Timer

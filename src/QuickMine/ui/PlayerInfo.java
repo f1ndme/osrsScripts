@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 
 import static org.dreambot.api.utilities.Logger.log;
 
-public class QuickInfo {
+public class PlayerInfo {
     public Image Animating_Icon;
     public Image Animating_Icon_Active;
     public int ScrW;

@@ -1,7 +1,7 @@
 package QuickMine;
 
-import QuickMine.ui.QuickInfo;
-import QuickMine.ui.QuickTime;
+import QuickMine.ui.PlayerInfo;
+import QuickMine.ui.ScriptTime;
 import org.dreambot.api.script.AbstractScript;
 import org.dreambot.api.script.Category;
 import org.dreambot.api.script.ScriptManifest;
@@ -12,34 +12,34 @@ import static QuickMine.resources.Enums.Priority.*;
 
 @ScriptManifest(category = Category.MINING, name = "Quick Mine 2.0", description = "Mines stuff.", author = "find me", version = 1.0)
 public class Main extends AbstractScript {
-    QuickTime quickTime;
-    QuickInfo quickInfo;
+    ScriptTime scriptTime;
+    PlayerInfo playerInfo;
     TaskManager taskManager;
 
 
     @Override
     public void onStart() {
-        quickTime = new QuickTime(getRandomManager());
+        scriptTime = new ScriptTime(getRandomManager());
 
-        quickInfo = new QuickInfo();
+        playerInfo = new PlayerInfo();
 
         taskManager = new TaskManager(JUSTGO);
     }
 
     @Override
     public void onPause() {
-        quickTime.onPause();
+        scriptTime.onPause();
     }
 
     @Override
     public void onResume() {
-        quickTime.onResume();
+        scriptTime.onResume();
     }
 
 
     @Override
     public int onLoop() {
-        quickTime.onLoop();
+        scriptTime.onLoop();
 
         taskManager.onLoop();
 
@@ -48,9 +48,9 @@ public class Main extends AbstractScript {
 
     @Override
     public void onPaint(Graphics g) {
-        quickTime.onPaint(g);
+        scriptTime.onPaint(g);
 
-        quickInfo.onPaint(g);
+        playerInfo.onPaint(g);
 
         taskManager.onPaint(g);
     }
