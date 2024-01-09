@@ -16,12 +16,7 @@ import static QuickMine.resources.Enums.Priority.JUSTGO;
 public class TaskManager extends TaskScript {
     public Priority priority;
 
-    @Override
-    public void onStart() {
-
-    }
-
-    public void onSetup(Priority... priorities) {
+    public TaskManager(Priority... priorities) {
         SkillTracker.start(Skill.MINING);
 
         setPriority(JUSTGO);
@@ -34,6 +29,9 @@ public class TaskManager extends TaskScript {
 
         setPriority(priority);
     }
+
+    @Override
+    public void onStart() {}
 
     public void setPriority(Priority priority) {
         switch (priority) {

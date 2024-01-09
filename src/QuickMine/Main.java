@@ -23,9 +23,7 @@ public class Main extends AbstractScript {
 
         quickInfo = new QuickInfo();
 
-        taskManager = new TaskManager();
-        taskManager.onStart();
-        taskManager.onSetup(JUSTGO);
+        taskManager = new TaskManager(JUSTGO);
     }
 
     @Override
