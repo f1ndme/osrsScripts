@@ -19,7 +19,7 @@ public class QuickWalkTask extends TaskNode {
     Locations selectedLocation;
     Tile selectedDestination;
     static long nextWalkTry;
-    final static int preWalkDelay = 1801;
+    final static int preWalkDelay = 1501;
 
     @Override
     public boolean accept() {
@@ -40,7 +40,7 @@ public class QuickWalkTask extends TaskNode {
     public int execute() {
         if (selectedDestination.distance(pl.getTile()) >= 6) {
             Walking.walk(selectedDestination);
-            nextWalkTry = System.currentTimeMillis() + preWalkDelay;
+            nextWalkTry = System.currentTimeMillis() + Calculations.random(preWalkDelay, preWalkDelay+300);
             Sleep.sleepUntil(this::shouldTryWalk, 30000);
         }
 
