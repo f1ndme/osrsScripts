@@ -55,7 +55,7 @@ public class PlayerInfo {
 
         if (Client.isLoggedIn()) {
             iconX = 12; //TopRight ChatBox X
-            iconY = (int) (ScrH - (ScrH * 0.308) - iconSize*1.5); //TopRight ChatBox Y
+            iconY = (int) (ScrH - (ScrH * 0.308) - iconSize*1.5 -14); //TopRight ChatBox Y
 
             LoginState = true;
         } else {
