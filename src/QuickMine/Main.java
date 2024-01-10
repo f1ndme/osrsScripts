@@ -36,7 +36,6 @@ public class Main extends AbstractScript {
         scriptTime.onResume();
     }
 
-
     @Override
     public int onLoop() {
         scriptTime.onLoop();
