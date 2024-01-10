@@ -5,6 +5,12 @@ import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.script.TaskNode;
 
 public class DropInventoryTask extends TaskNode {
+
+    @Override
+    public int priority() {
+        return 3;
+    }
+
     @Override
     public boolean accept() {
         return Inventory.isFull();

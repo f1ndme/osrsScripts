@@ -22,6 +22,11 @@ public class QuickWalkTask extends TaskNode {
     final static int preWalkDelay = 1501;
 
     @Override
+    public int priority() {
+        return 1;
+    }
+
+    @Override
     public boolean accept() {
         pl = Players.getLocal();
         if (pl == null) return false;

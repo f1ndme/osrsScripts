@@ -22,6 +22,11 @@ public class QuickMineTask extends TaskNode {
     Tile playerTile;
 
     @Override
+    public int priority() {
+        return 2;
+    }
+
+    @Override
     public boolean accept() {
         pl = Players.getLocal();
         if (pl == null) return false;
