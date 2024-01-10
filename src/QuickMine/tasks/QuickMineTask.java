@@ -38,7 +38,7 @@ public class QuickMineTask extends TaskNode {
     }
 
     public long nextMineTry;
-    public final int preMineDelay = 4201;
+    public final int preMineDelay = 4201; //extra high to reach rimmy randoms, resets on complete mine though.
     public boolean shouldTryMine() {
         return !Calculations.isBefore(nextMineTry) && !isMining() && !pl.isMoving();
     }
