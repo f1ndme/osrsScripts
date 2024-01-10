@@ -20,7 +20,7 @@ import static QuickMine.resources.Enums.Ores.allMineableOres;
 import static QuickMine.resources.Enums.Pickaxes.hasUsablePickaxe;
 
 public class QuickMineTask extends TaskNode {
-    final int miningTolerance = 18;
+    final int miningTolerance = 12;
 
     Player pl;
     GameObject attemptingOre;
@@ -38,7 +38,7 @@ public class QuickMineTask extends TaskNode {
     }
 
     public long nextMineTry;
-    public final int preMineDelay = 3001;
+    public final int preMineDelay = 4201;
     public boolean shouldTryMine() {
         return !Calculations.isBefore(nextMineTry) && !isMining() && !pl.isMoving();
     }
@@ -66,6 +66,8 @@ public class QuickMineTask extends TaskNode {
             GameObject closest = GameObjects.closest(object -> object.getName().equalsIgnoreCase("rocks") && object.distance(pl.getTile()) <= 2);
             if (closest != null) {
                 if (closest.getTile().equals(attemptingOre.getTile())) {
+                    nextMineTry = 0;
+
                     return false;
                 }
             }
