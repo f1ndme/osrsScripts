@@ -11,20 +11,20 @@ import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.Player;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 import static QuickMine.resources.Enums.Ores.allMineableOres;
 import static QuickMine.resources.Enums.Pickaxes.hasUsablePickaxe;
 
 public class QuickMineTask extends TaskNode {
-    final int miningTolerance = 6;
+    final int miningTolerance = 12;
 
     Player pl;
     GameObject attemptingOre;
     Tile playerTile;
-
-    @Override
-    public int priority() {
-        return 2;
-    }
 
     @Override
     public boolean accept() {
@@ -34,7 +34,13 @@ public class QuickMineTask extends TaskNode {
         playerTile = pl.getTile();
         if (playerTile == null) return false;
 
-        return hasUsablePickaxe() && !Inventory.isFull() && !isMining() && !pl.isMoving();
+        return hasUsablePickaxe() && !Inventory.isFull();
+    }
+
+    public long nextMineTry;
+    public final int preMineDelay = 3001;
+    public boolean shouldTryMine() {
+        return !Calculations.isBefore(nextMineTry) && !isMining() && !pl.isMoving();
     }
 
     @Override
@@ -42,11 +48,15 @@ public class QuickMineTask extends TaskNode {
         attemptingOre = getClosestMinableOre();
         if (attemptingOre == null) return 50;
 
+        if (isMining()) return Calculations.random(300, 601);
+        if (pl.isMoving()) return Calculations.random(300, 601); //ore distance based delay.
+
         if (attemptingOre.interact("Mine")) {
-            Sleep.sleepUntil(this::isMining, Calculations.random(200, 400));
+            nextMineTry = System.currentTimeMillis() + Calculations.random(preMineDelay, preMineDelay+300);
+            Sleep.sleepUntil(this::shouldTryMine, 30000);
         }
 
-        return Calculations.random(601, 1100);
+        return Calculations.random(300, 601);
     }
 
     private boolean isMining() {
@@ -65,17 +75,27 @@ public class QuickMineTask extends TaskNode {
     }
 
     private GameObject getClosestMinableOre() {
-            for (int i = allMineableOres().size(); i-- > 0; ) {
-                Ores ore = allMineableOres().get(i);
+        List<GameObject> availableNodes = new ArrayList<>();
 
-                GameObject obj = GameObjects.closest(object -> object.getName().equalsIgnoreCase(ore.name) &&
-                        object.hasAction("Mine") &&
-                        object.getModelColors() != null &&
-                        object.distance(pl.getTile()) <= miningTolerance);
+        for (int i = allMineableOres().size(); i-- > 0; ) {
+            Ores ore = allMineableOres().get(i);
 
-                if (obj != null) {
-                    return obj;
+            List<GameObject> obj = GameObjects.all(object -> object.getName().equalsIgnoreCase(ore.name) &&
+                    object.hasAction("Mine") &&
+                    object.getModelColors() != null &&
+                    object.distance(pl.getTile()) <= miningTolerance);
+
+            if (obj != null) { //god kill this dumpster fire.
+                for (int k=obj.size(); k-- > 0; ) {
+                    availableNodes.add(obj.get(k));
                 }
+            }
+        }
+
+        GameObject randomOre = Collections.unmodifiableList(availableNodes).get(new Random().nextInt(Collections.unmodifiableList(availableNodes).size()));
+
+        if (randomOre != null) {
+            return randomOre;
         }
 
         return null;

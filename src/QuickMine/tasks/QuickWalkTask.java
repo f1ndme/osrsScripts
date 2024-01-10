@@ -22,11 +22,6 @@ public class QuickWalkTask extends TaskNode {
     final static int preWalkDelay = 1501;
 
     @Override
-    public int priority() {
-        return 1;
-    }
-
-    @Override
     public boolean accept() {
         pl = Players.getLocal();
         if (pl == null) return false;
@@ -36,17 +31,17 @@ public class QuickWalkTask extends TaskNode {
             chooseStartingArea();
         }
 
-        if (selectedDestination == null) return false;
-
-        return !selectedLocation.area.contains(pl.getTile());
+        return selectedDestination != null;
     }
 
     @Override
     public int execute() {
-        if (selectedDestination.distance(pl.getTile()) >= 6) {
+        if (selectedDestination.distance(pl.getTile()) >= 4) {
             Walking.walk(selectedDestination);
             nextWalkTry = System.currentTimeMillis() + Calculations.random(preWalkDelay, preWalkDelay+300);
             Sleep.sleepUntil(this::shouldTryWalk, 30000);
+        }else if ((selectedDestination.distance(pl.getTile()) <= 4)) {
+            selectedDestination = null;
         }
 
         return 50;
@@ -67,6 +62,7 @@ public class QuickWalkTask extends TaskNode {
 
         selectedLocation = randomOre.locations.get(randomKey);
         selectedDestination = selectedLocation.area.getRandomTile(); //random area, random tile
+
         log("Ore selected to mine near: " + randomOre.name + ". Location selected to mine: " + selectedLocation + ".");
     }
 }
