@@ -20,7 +20,7 @@ import static QuickMine.resources.Enums.Ores.allMineableOres;
 import static QuickMine.resources.Enums.Pickaxes.hasUsablePickaxe;
 
 public class QuickMineTask extends TaskNode {
-    final int miningTolerance = 12;
+    final int miningTolerance = 18;
 
     Player pl;
     GameObject attemptingOre;
