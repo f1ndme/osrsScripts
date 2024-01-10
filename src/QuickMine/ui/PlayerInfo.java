@@ -283,6 +283,8 @@ public class PlayerInfo {
 
 
     public void onPaint(Graphics g) {
+        if (!Client.isLoggedIn()) return;
+
         if (iconColor == null || ResolutionChange() || LoginStateChange()) { //Replace null check.
             SetupUI();
         }

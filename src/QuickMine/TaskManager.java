@@ -4,6 +4,7 @@ import QuickMine.resources.Enums.*;
 import QuickMine.tasks.DropInventoryTask;
 import QuickMine.tasks.QuickMineTask;
 import QuickMine.tasks.QuickWalkTask;
+import org.dreambot.api.Client;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.SkillTracker;
 import org.dreambot.api.methods.skills.Skills;
@@ -52,6 +53,8 @@ public class TaskManager extends TaskScript {
 
     @Override
     public void onPaint(Graphics g) {
+        if (!Client.isLoggedIn()) return;
+
         String miningLevel = String.format(
                 "Mining Level: %d",
                 Skills.getRealLevel(Skill.MINING)
