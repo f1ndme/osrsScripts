@@ -1,6 +1,6 @@
 package QuickMine.ui;
 
-import QuickMine.resources.Enums;
+import QuickMine.Resources;
 import org.dreambot.api.Client;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.walking.impl.Walking;
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static QuickMine.Resources.cantorPairing;
 import static org.dreambot.api.utilities.Logger.log;
 
 public class PlayerInfo {
@@ -25,11 +26,11 @@ public class PlayerInfo {
     public int iconY;
     public int iconSize;
     public Color iconColor;
-    public int LastScreenSize;
+    public int lastScreenSize;
     public boolean LoginState;
 
     public boolean ResolutionChange() {
-        return LastScreenSize != Client.getViewportWidth() + Client.getViewportHeight();
+        return lastScreenSize != cantorPairing(Client.getViewportWidth(), Client.getViewportHeight());
     }
 
     public boolean LoginStateChange() {
@@ -48,7 +49,8 @@ public class PlayerInfo {
 
         ScrW = Client.getViewportWidth();
         ScrH = Client.getViewportHeight();
-        LastScreenSize = ScrW+ScrH;
+
+        lastScreenSize = cantorPairing(ScrW, ScrH);
 
         iconSize = 32;
         iconColor = new Color(80, 80, 80, 160);
@@ -315,11 +317,11 @@ public class PlayerInfo {
         }
     }
 
-    public String Directory(Enums.Resources... finalDirectory) {
-        String sourceDirectory = System.getProperty("user.dir").replace('\\', '/') + "Scripts/" + Enums.Resources.SOURCE.dir;
+    public String Directory(Resources.FileResources... finalDirectory) {
+        String sourceDirectory = System.getProperty("user.dir").replace('\\', '/') + "Scripts/" + Resources.FileResources.SOURCE.dir;
 
         if (finalDirectory.length > 0) {
-            sourceDirectory = System.getProperty("user.dir").replace('\\', '/') + "Scripts/" + Enums.Resources.SOURCE.dir + finalDirectory[0].dir;
+            sourceDirectory = System.getProperty("user.dir").replace('\\', '/') + "Scripts/" + Resources.FileResources.SOURCE.dir + finalDirectory[0].dir;
         }
 
         return sourceDirectory;
@@ -328,11 +330,11 @@ public class PlayerInfo {
     public void buildFileDirectory() {
         try {
             Files.createDirectories(Paths.get(Directory()));
-            Files.createDirectories(Paths.get(Directory(Enums.Resources.IMAGES)));
+            Files.createDirectories(Paths.get(Directory(Resources.FileResources.IMAGES)));
         } catch (IOException e) { log(e); }
 
         try {//Try collect Animating_Icon image resource.
-            Image original = ImageIO.read(new File(Directory(Enums.Resources.IMAGES) + "Animating_Icon.png"));
+            Image original = ImageIO.read(new File(Directory(Resources.FileResources.IMAGES) + "Animating_Icon.png"));
             Image resizedImage = original.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
             Animating_Icon = resizedImage;
         } catch (IOException e) {
@@ -340,7 +342,7 @@ public class PlayerInfo {
         }
 
         try {//Try collect Animating_Icon_Active image resource.
-            Image original = ImageIO.read(new File(Directory(Enums.Resources.IMAGES) + "Animating_Icon_Active.png"));
+            Image original = ImageIO.read(new File(Directory(Resources.FileResources.IMAGES) + "Animating_Icon_Active.png"));
             Image resized = original.getScaledInstance(32, 32, Image.SCALE_SMOOTH);
             Animating_Icon_Active = resized;
         } catch (IOException e) {

@@ -1,24 +1,29 @@
-package QuickMine.resources;
+package QuickMine;
 
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
+import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
+import org.dreambot.api.wrappers.interactive.GameObject;
+import org.dreambot.api.wrappers.interactive.Player;
 
 import java.util.*;
 
-public class Enums {
+public class Resources {
 
-    public enum Priority { JUSTGO, EXPERIENCE, GOLD }
+    public static int cantorPairing(int x,int y) {
+        return (x+y) * (x+y+1) / 2+y; //generate unique int from x,y coords.
+    }
 
-    public enum Resources {
+    public enum FileResources {
         SOURCE("findme/"),
         IMAGES("images/");
 
         public final String dir;
 
-        Resources(String dir) { this.dir = dir; };
+        FileResources(String dir) { this.dir = dir; };
     }
 
     public enum Locations {
@@ -41,7 +46,16 @@ public class Enums {
         }
 
         public static Locations randomArea() {
-            return Collections.unmodifiableList(Arrays.asList(values())).get(new Random().nextInt(Collections.unmodifiableList(Arrays.asList(values())).size()));
+            return List.of(values()).get(new Random().nextInt(List.of(values()).size()));
+        }
+
+        public static Locations randomMinableLocation() {
+            List<Ores> minableOres = Ores.allMineableOres();
+
+            Ores randomOre = Collections.unmodifiableList(minableOres).get(new Random().nextInt(Collections.unmodifiableList(minableOres).size()));
+            int randomKey = new Random().nextInt(randomOre.locations.size());
+
+            return randomOre.locations.get(randomKey);
         }
     }
 
@@ -67,7 +81,7 @@ public class Enums {
         }
 
         public static Ores randomOre() {
-            return Collections.unmodifiableList(Arrays.asList(values())).get(new Random().nextInt(Collections.unmodifiableList(Arrays.asList(values())).size()));
+            return List.of(values()).get(new Random().nextInt(List.of(values()).size()));
         }
 
         public static Ores highestMineableOre() {
@@ -93,6 +107,27 @@ public class Enums {
 
             return oreList;
         }
+
+        public static ArrayList<GameObject> getMinableOresNear(Player pl, int miningTolerance) {
+            ArrayList<GameObject> minableOresNear = new ArrayList<>();
+
+            List<GameObject> availableOres = GameObjects.all(object -> object.hasAction("Mine") && object.getModelColors() != null && object.distance(pl.getTile()) <= miningTolerance);
+            if (availableOres.isEmpty()) {
+                return minableOresNear;
+            }
+
+            for (int i=0; i < availableOres.size(); i++) {
+                for(int k=0; k < allMineableOres().size(); k++) {
+                    Ores minableOre = allMineableOres().get(k);
+
+                    if (availableOres.get(i).getName().equalsIgnoreCase(minableOre.name)) {
+                        minableOresNear.add(availableOres.get(i));
+                    }
+                }
+            }
+
+            return minableOresNear;
+        }
     }
 
     public enum Pickaxes {
@@ -116,7 +151,7 @@ public class Enums {
             this.level = level;
         }
         public static Pickaxes randomPickaxe() {
-            return Collections.unmodifiableList(Arrays.asList(values())).get(new Random().nextInt(Collections.unmodifiableList(Arrays.asList(values())).size()));
+            return List.of(values()).get(new Random().nextInt(List.of(values()).size()));
         }
 
         public static Pickaxes highestUsablePickaxe() { //NO MINING LEVEL SETUP FOR USE YET

@@ -6,7 +6,7 @@ import org.dreambot.api.utilities.Timer;
 
 import java.awt.*;
 
-import static QuickMine.resources.Functions.cantorPairing;
+import static QuickMine.Resources.cantorPairing;
 
 
 public class ScriptTime {
