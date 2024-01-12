@@ -170,6 +170,8 @@ public class Main extends AbstractScript {
 
     @Override
     public void onStart() {
+        buildFileDirectories();
+
         scriptTime = new ScriptTime(getRandomManager());
 
         if (!loginReady) return;

@@ -6,27 +6,14 @@ import org.dreambot.api.utilities.Timer;
 
 import java.awt.*;
 
-import static QuickMine.Resources.cantorPairing;
+import static QuickMine.Resources.*;
 
 
 public class ScriptTime {
-    public Timer runTime;
-    public Timer pausedTime;
-    public Font[] fonts;
-    public String[] pauseReason;
-    public int currentPauseReason;
-    public RandomManager randomManager;
-
     public ScriptTime(RandomManager manager) {
         this.randomManager = manager;
 
         runTime = new Timer(); //initialize Script Timer
-
-        fonts = new Font[]{
-                new Font("Times New Roman", Font.BOLD, 16),
-                new Font("Times New Roman", Font.PLAIN, 14),
-                new Font("Default", Font.PLAIN, 12)
-        };
 
         pauseReason = new String[]{
                 "Logging in...",
@@ -34,6 +21,15 @@ public class ScriptTime {
                 "Client Paused."
         };
     }
+    public Timer runTime;
+    public Timer pausedTime;
+    public String[] pauseReason;
+    public int currentPauseReason;
+    public RandomManager randomManager;
+
+
+
+
 
     public void onLoop() {
         pauseCheck();
@@ -110,20 +106,6 @@ public class ScriptTime {
     public int lastScreenSize;
     public boolean loginState;
 
-    public boolean ResolutionChange() {
-        return lastScreenSize != cantorPairing(Client.getViewportWidth(), Client.getViewportHeight());
-    }
-
-    public boolean LoginStateChange() {
-        if (loginState != Client.isLoggedIn()) {
-            loginState = Client.isLoggedIn();
-
-            return true;
-        }
-
-        return false;
-    }
-
     public void RebuildUI() {
         ScrW = Client.getViewportWidth();
         ScrH = Client.getViewportHeight();
@@ -146,13 +128,17 @@ public class ScriptTime {
     }
 
     public void onPaint(Graphics g) {
-        if (frameColor == null || ResolutionChange() || LoginStateChange() || (originY == 2 && !randomManager.isSolving())) { //Replace null check.
+        if (frameColor == null || ResolutionChange(lastScreenSize) || LoginStateChange(loginState) || (originY == 2 && !randomManager.isSolving())) { //Replace null check.
             RebuildUI();
         }
         
         DrawFrame(g, originX, originY);
         DrawContents(g, originX, originY);
     }
+
+
+
+
 
     public void DrawFrame(Graphics g, int x, int y) {
         g.setColor(frameColor);

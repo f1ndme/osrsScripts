@@ -1,5 +1,6 @@
 package QuickMine;
 
+import org.dreambot.api.Client;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.interactive.GameObjects;
@@ -9,9 +10,54 @@ import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.Player;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
+
+import static org.dreambot.api.utilities.Logger.log;
 
 public class Resources {
+    public static Font[] fonts = new Font[]{
+        new Font("Times New Roman", Font.BOLD, 16),
+        new Font("Times New Roman", Font.PLAIN, 14),
+        new Font("Default", Font.PLAIN, 12)
+    };
+
+    public static boolean ResolutionChange(int lastScreenSize) {
+        return lastScreenSize != cantorPairing(Client.getViewportWidth(), Client.getViewportHeight());
+    }
+
+    public static boolean LoginStateChange(boolean loginState) {
+        if (loginState != Client.isLoggedIn()) {
+            loginState = Client.isLoggedIn();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public static String Directory(Resources.FileResources... finalDirectory) {
+        String sourceDirectory = System.getProperty("user.dir").replace('\\', '/') + "Scripts/" + Resources.FileResources.SOURCE.dir;
+
+        if (finalDirectory.length > 0) {
+            sourceDirectory = System.getProperty("user.dir").replace('\\', '/') + "Scripts/" + Resources.FileResources.SOURCE.dir + finalDirectory[0].dir;
+        }
+
+        return sourceDirectory;
+    }
+
+    public static void buildFileDirectories() {
+        try {
+            Files.createDirectories(Paths.get(Directory()));
+            Files.createDirectories(Paths.get(Directory(Resources.FileResources.IMAGES)));
+        } catch (IOException e) { log(e); }
+    }
 
     public static int cantorPairing(int x,int y) {
         return (x+y) * (x+y+1) / 2+y; //generate unique int from x,y coords.
