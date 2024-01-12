@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 
 import static QuickMine.Resources.*;
-import static org.dreambot.api.utilities.Logger.log;
 
 public class PlayerInfo {
     public Image animatingIcon;
