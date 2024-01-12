@@ -33,13 +33,7 @@ public class Resources {
     }
 
     public static boolean LoginStateChange(boolean loginState) {
-        if (loginState != Client.isLoggedIn()) {
-            loginState = Client.isLoggedIn();
-
-            return true;
-        }
-
-        return false;
+        return (loginState != Client.isLoggedIn());
     }
 
     public static String Directory(Resources.FileResources... finalDirectory) {

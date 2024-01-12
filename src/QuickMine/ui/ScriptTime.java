@@ -120,10 +120,12 @@ public class ScriptTime {
             originX = (int) (ScrW - (ScrW * 0.354)); //TopRight ChatBox X
             originY = (int) (ScrH - (ScrH * 0.308)); //TopRight ChatBox Y
 
-            loginState = true;
+            loginState = true; //is this even doing anything. cant think
         } else {
             originX = 2+ frameWidth;
             originY = 2;
+
+            loginState = false; //is this even doing anything. cant think
         }
     }
 

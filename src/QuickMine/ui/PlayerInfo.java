@@ -44,13 +44,15 @@ public class PlayerInfo {
         iconColor = new Color(80, 80, 80, 160);
 
         if (Client.isLoggedIn()) {
-            iconX = 8; //TopRight ChatBox X
-            iconY = (int) (ScrH - (ScrH * 0.308) - iconSize*1.5 -14); //TopRight ChatBox Y
+            iconX = 8;
+            iconY = (int) (ScrH - (ScrH * 0.308) - iconSize*1.5 -14);
 
-            loginState = true;
+            loginState = true; //is this even doing anything. cant think
         } else {
             iconX = 2+ iconSize;
             iconY = 2;
+
+            loginState = false; //is this even doing anything. cant think
         }
     }
 
