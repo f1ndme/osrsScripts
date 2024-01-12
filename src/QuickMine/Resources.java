@@ -1,6 +1,7 @@
 package QuickMine;
 
 import org.dreambot.api.Client;
+import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.interactive.GameObjects;
@@ -90,10 +91,11 @@ public class Resources {
         public static Locations randomMinableLocation() {
             List<Ores> minableOres = Ores.allMineableOres();
 
-            Ores randomOre = Collections.unmodifiableList(minableOres).get(new Random().nextInt(Collections.unmodifiableList(minableOres).size()));
-            int randomKey = new Random().nextInt(randomOre.locations.size());
+            int randomKey = Calculations.random(0, minableOres.size());
+            Ores randomOre = minableOres.get(randomKey);
+            int randomLocationKey = Calculations.random(0, randomOre.locations.size());
 
-            return randomOre.locations.get(randomKey);
+            return randomOre.locations.get(randomLocationKey);
         }
     }
 

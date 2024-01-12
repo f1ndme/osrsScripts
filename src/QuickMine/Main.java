@@ -22,19 +22,18 @@ import org.dreambot.api.wrappers.interactive.Player;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
 
 import static QuickMine.Resources.*;
 import static QuickMine.Resources.Pickaxes.hasUsablePickaxe;
 
-@ScriptManifest(category = Category.MINING, name = "Quick Mine 2.0", description = "Mines stuff.", author = "find me", version = 1.0)
+@ScriptManifest(category = Category.MINING, name = "Quick Mine 2.1", description = "Mines stuff.", author = "find me", version = 1.0)
 public class Main extends AbstractScript {
     final int preWalkDelay = 1501;
     final int miningTolerance = 14; //How far can we see ores.
     final int preMineDelay = 4801; //Extra high to reach far away ores, resets on completed mine though. Could adjust on isRunning.
     final long locationChangeMinTime = 10 * 60000; //Minutes
     final long locationChangeMaxTime = 15 * 60000; //Minutes
+    final int loopDelay = 100;
     boolean loginReady;
     ScriptTime scriptTime;
     PlayerInfo playerInfo;
@@ -132,7 +131,7 @@ public class Main extends AbstractScript {
                 //go to mining location.
 
                 walkingChecks();
-                return 20;
+                return loopDelay;
             }
             //Walk code has gotten us here, mine stuff.
 
@@ -141,10 +140,10 @@ public class Main extends AbstractScript {
             }
             if (locationTimer.elapsed() >= timeTillLocationChange) {
                 findMiningLocation();
-                return 20;
+                return loopDelay;
             }
 
-            if (!shouldTryMine()) return 20;
+            if (!shouldTryMine()) return loopDelay;
 
             if (Inventory.isFull()) {
                 Sleep.sleepWhile(this::droppingInventory, 15000);
@@ -153,11 +152,12 @@ public class Main extends AbstractScript {
             ArrayList<GameObject> minableOresNear = Ores.getMinableOresNear(pl, miningTolerance);
             if (minableOresNear.isEmpty()) { //Might be something weird in method, might just not be collecting GameObjects cause connection error or something? Should TryCheck this & change location.
                 log("No minable ores found! Switch locations? This really shouldn't happen? But it does, care.");
-                return 20;
+                return loopDelay;
             }
 
-            attemptingOre = Collections.unmodifiableList(minableOresNear).get(new Random().nextInt(Collections.unmodifiableList(minableOresNear).size()));
-            if (attemptingOre == null) return 20;
+            int randomKey = Calculations.random(0, minableOresNear.size());
+            attemptingOre = minableOresNear.get(randomKey);
+            if (attemptingOre == null) return loopDelay;
 
             if (attemptingOre.interact("Mine")) {
                 nextMineTry = System.currentTimeMillis() + Calculations.random(preMineDelay, preMineDelay+300);
@@ -200,7 +200,7 @@ public class Main extends AbstractScript {
     @Override
     public int onLoop() {
         pl = Players.getLocal();
-        if (pl == null) return 20;
+        if (pl == null) return loopDelay;
 
         if (scriptTime != null) {
             scriptTime.onLoop();
@@ -211,7 +211,7 @@ public class Main extends AbstractScript {
                 firstLogin();
             }
 
-            return 20;
+            return loopDelay;
         }
 
         return readyLoop();
