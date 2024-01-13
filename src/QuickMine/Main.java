@@ -144,9 +144,9 @@ public class Main extends AbstractScript implements ItemContainerListener {
     boolean lastAction;
 
     public int readyLoop() {
-        if (ClientSettings.getClientLayout() != ClientLayout.RESIZABLE_CLASSIC) {
-            ClientSettings.setClientLayout(ClientLayout.RESIZABLE_CLASSIC);
-        }
+        //if (ClientSettings.getClientLayout() != ClientLayout.RESIZABLE_CLASSIC) {
+        //    ClientSettings.setClientLayout(ClientLayout.RESIZABLE_CLASSIC);
+        //}
 
         if (readyToMine()) {
             if (!atMiningLocation) {
