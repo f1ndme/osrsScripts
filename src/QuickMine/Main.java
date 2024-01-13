@@ -15,20 +15,24 @@ import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.script.AbstractScript;
 import org.dreambot.api.script.Category;
 import org.dreambot.api.script.ScriptManifest;
+import org.dreambot.api.script.event.impl.InventoryItemEvent;
+import org.dreambot.api.script.listener.ItemContainerListener;
+import org.dreambot.api.utilities.Hash;
 import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.Player;
-import org.dreambot.api.wrappers.interactive.WalkingQueueSpeed;
+import org.dreambot.api.wrappers.items.Item;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import static QuickMine.Resources.*;
 import static QuickMine.Resources.Pickaxes.hasUsablePickaxe;
 
 @ScriptManifest(category = Category.MINING, name = "Quick Mine 2.1", description = "Mines stuff.", author = "find me", version = 1.0)
-public class Main extends AbstractScript {
+public class Main extends AbstractScript implements ItemContainerListener {
     final int preWalkDelay = 1501;
     final int miningTolerance = 14; //How far can we see ores.
     final int preMineDelay = 4801; //Extra high to reach far away ores, resets on completed mine though. Could adjust on isRunning.
@@ -70,7 +74,7 @@ public class Main extends AbstractScript {
             Sleep.sleepUntil(this::shouldTryWalk, 15000);
         }else if ((miningLocationTile.distance(pl.getTile()) <= 4)) {
             atMiningLocation = true;
-            log("We have arrived at our mining location!");
+            //log("We have arrived at our mining location!");
         }
     }
     public boolean shouldTryWalk() {
@@ -86,7 +90,7 @@ public class Main extends AbstractScript {
         miningLocation = Locations.randomMinableLocation();
         miningLocationTile = miningLocation.area.getRandomTile();
 
-        log("Mining location set to: " + miningLocation.name());
+        //log("Mining location set to: " + miningLocation.name());
     }
     public boolean readyToMine() {
         return hasUsablePickaxe();
@@ -103,10 +107,7 @@ public class Main extends AbstractScript {
                 if (closest.getTile().equals(attemptingOre.getTile())) {
 
                     attemptingLocationObject = getObjectFromTile(attemptingOre.getTile());
-                    log(attemptingLocationObject.getName());
-
-                    //log(attemptingOre.getTile().getTileReference().getObjects()[0].getName());
-                    //log(attemptingOre.getTile().getTileReference().getReference());
+                    //log(attemptingLocationObject.getName());
 
                     nextMineTry = 0;
 
@@ -247,7 +248,86 @@ public class Main extends AbstractScript {
 
         drawDistanceTo(g, miningLocationTile);
         drawAttemptingObject(g);
+        drawOreCollection(g);
     }
+
+
+    long uiHoldTime;
+    String lastGrab;
+    public void drawOreCollection(Graphics g) {
+        if (oreCollection == null) {
+            oreCollection = new Hashtable<>();
+
+            for (Ores o: Ores.values()) {
+                oreCollection.put(o, 0);
+            }
+        }
+
+        int stringWidth = g.getFontMetrics().stringWidth("Adamant: 10");
+
+        int i = 0;
+        for (Ores o: Ores.values()) {
+            int count = oreCollection.get(o);
+            String[] nameSplit = o.name.split(" ", 2);
+            String name = nameSplit[0];
+
+            String display = name + ": ";
+
+            FontMetrics metrics = g.getFontMetrics();
+            stringWidth = metrics.stringWidth(display);
+
+            g.setColor(Color.gray);
+
+            if (lastGrab != null) {
+                if (display.contains(lastGrab) && Calculations.isBefore(uiHoldTime)) {
+                    g.setColor(Color.green);
+                    g.drawString("" + count, (int) (Client.getViewportWidth() - (Client.getViewportWidth() * 0.420)) + stringWidth, (int) (Client.getViewportHeight() - (Client.getViewportHeight() * 0.500) - 34)+(i*15));
+                    g.setColor(Color.white);
+                }else {
+                    g.setColor(Color.gray);
+                    g.drawString("" + count, (int) (Client.getViewportWidth() - (Client.getViewportWidth() * 0.420)) + stringWidth, (int) (Client.getViewportHeight() - (Client.getViewportHeight() * 0.500) - 34)+(i*15));
+                }
+            }else {
+                g.setColor(Color.gray);
+                g.drawString("" + count, (int) (Client.getViewportWidth() - (Client.getViewportWidth() * 0.420)) + stringWidth, (int) (Client.getViewportHeight() - (Client.getViewportHeight() * 0.500) - 34)+(i*15));
+            }
+
+            g.drawString(display, (int) (Client.getViewportWidth() - (Client.getViewportWidth() * 0.420)), (int) (Client.getViewportHeight() - (Client.getViewportHeight() * 0.500) - 34)+(i*15));
+            i++;
+        }
+
+        g.setColor(Color.white);
+        g.drawString("Ores Mined:", (int) (Client.getViewportWidth() - (Client.getViewportWidth() * 0.420)), (int) (Client.getViewportHeight() - (Client.getViewportHeight() * 0.500) - 50));
+    }
+
+
+    Hashtable<Ores, Integer> oreCollection;
+    public void onInventoryItemChanged(Item incoming, Item existing) {}
+    public void onInventoryItemAdded(Item item) {
+        for (Ores ore : Ores.values()) {
+            String realOreName;
+            if (item.getName().contains("Coal")) {
+                realOreName = "Coal";
+            }else if (item.getName().contains("Clay")) {
+                realOreName = "Clay";
+            }else {
+                String[] oreEnumNameSplit = ore.name.split(" ", 2);
+                String[] itemNameSplit = item.getName().split(" ", 2);
+
+                realOreName = oreEnumNameSplit[0] + " " + itemNameSplit[1];
+            }
+
+            if (realOreName.contains(item.getName())) {
+                int oldValue = oreCollection.get(ore);
+                oreCollection.put(ore, oldValue + 1);
+                uiHoldTime = System.currentTimeMillis() + 6000;
+
+                String[] oreEnumNameSplit = ore.name.split(" ", 2);
+                lastGrab = oreEnumNameSplit[0];
+            }
+        }
+    }
+
 
     public void drawAttemptingObject(Graphics g) {
         FontMetrics metrics = g.getFontMetrics();
@@ -272,11 +352,12 @@ public class Main extends AbstractScript {
 
         if (Players.getLocal().getTile().walkingDistance(tile) > 25) {
             g.setColor(Color.green);
-            g.drawString("" + (int)Players.getLocal().getTile().walkingDistance(tile), 5 + stringWidth, 200);
+            g.drawString("" + (int)Players.getLocal().getTile().walkingDistance(tile), 5 + stringWidth, 215);
             g.setColor(Color.white);
+            g.drawString("Distance Until Arrival: ", 5, 215);
+        } else {
+            g.drawString("Distance Until Arrival: ", 5, 200);
         }
-
-        g.drawString("Distance Until Arrival: ", 5, 200);
     }
 
     public void drawMiningInformation(Graphics g) {
@@ -292,11 +373,9 @@ public class Main extends AbstractScript {
         );
 
         g.setColor(Color.white);
-        g.drawString("(" + miningLocation.realName + "):", 5, 230);
+        g.drawString("(" + miningLocation.realName + ")", 5, 230);
 
         if (locationTimer != null && miningLocation != null) {
-            //String text = "(" + miningLocation.name() + ")";
-
             FontMetrics metrics = g.getFontMetrics();
             int stringWidth = metrics.stringWidth("Time spent mining: ");
 
