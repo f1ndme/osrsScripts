@@ -392,7 +392,7 @@ public class Main extends AbstractScript implements ItemContainerListener {
         }
 
         g.setColor(Color.gray);
-        g.drawString(miningLevel, 5, 155);
-        g.drawString(experienceGainedText, 5, 170);
+        g.drawString(miningLevel, 5, Client.getViewportHeight() - 345);
+        g.drawString(experienceGainedText, 5, Client.getViewportHeight() - 360);
     }
 }
