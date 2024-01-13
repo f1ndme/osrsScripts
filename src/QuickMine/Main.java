@@ -144,9 +144,9 @@ public class Main extends AbstractScript implements ItemContainerListener {
     boolean lastAction;
 
     public int readyLoop() {
-        //if (ClientSettings.getClientLayout() != ClientLayout.RESIZABLE_CLASSIC) {
-            //ClientSettings.setClientLayout(ClientLayout.RESIZABLE_CLASSIC);
-        //}
+        if (ClientSettings.getClientLayout() != ClientLayout.RESIZABLE_CLASSIC) {
+            ClientSettings.setClientLayout(ClientLayout.RESIZABLE_CLASSIC);
+        }
 
         if (readyToMine()) {
             if (!atMiningLocation) {
@@ -324,12 +324,9 @@ public class Main extends AbstractScript implements ItemContainerListener {
     public void onInventoryItemChanged(Item incoming, Item existing) {}
     public void onInventoryItemAdded(Item item) {
         for (Ores ore : Ores.values()) {
-
             String[] enumSplit = ore.name.split(" ", 2);
-
             String realOreName = enumSplit[0];
 
-            log(item.getName() + ", " + realOreName);
 
             if (item.getName().contains(realOreName)) {
                 int oldValue = oreCollection.get(ore);
