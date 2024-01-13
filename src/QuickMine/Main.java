@@ -31,13 +31,16 @@ import java.util.Hashtable;
 import static QuickMine.Resources.*;
 import static QuickMine.Resources.Pickaxes.hasUsablePickaxe;
 
+//every 3 min or something, check fail rate on ores, an exclude.
+//when none, switch ore type. higher/lower/world-hop?
+
 @ScriptManifest(category = Category.MINING, name = "Quick Mine 2.1", description = "Mines stuff.", author = "find me", version = 1.0)
 public class Main extends AbstractScript implements ItemContainerListener {
-    final int preWalkDelay = Calculations.random(300, 601);
     final int miningTolerance = 14; //How far can we see ores.
-    final int preMineDelay = Calculations.random(300, 601); //Extra high to reach far away ores, resets on completed mine though. Could adjust on isRunning.
     final long locationChangeMinTime = 10 * 60000; //Minutes
     final long locationChangeMaxTime = 15 * 60000; //Minutes
+    final int preMineDelay = Calculations.random(1201, 1801); //seems to retry less with this higher
+    final int preWalkDelay = Calculations.random(300, 601); //but this matters in another case.
     final int loopDelay = 100;
     boolean loginReady;
     ScriptTime scriptTime;
