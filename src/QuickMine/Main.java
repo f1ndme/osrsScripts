@@ -144,9 +144,9 @@ public class Main extends AbstractScript implements ItemContainerListener {
     boolean lastAction;
 
     public int readyLoop() {
-        if (ClientSettings.getClientLayout() != ClientLayout.RESIZABLE_CLASSIC) {
-            ClientSettings.setClientLayout(ClientLayout.RESIZABLE_CLASSIC);
-        }
+        //if (ClientSettings.getClientLayout() != ClientLayout.RESIZABLE_CLASSIC) {
+            //ClientSettings.setClientLayout(ClientLayout.RESIZABLE_CLASSIC);
+        //}
 
         if (readyToMine()) {
             if (!atMiningLocation) {
@@ -184,7 +184,7 @@ public class Main extends AbstractScript implements ItemContainerListener {
             if (attemptingOre.interact("Mine")) {
                 nextMineTry = System.currentTimeMillis() + Calculations.random(preMineDelay, preMineDelay+300);
                 attemptingLocationObject = getObjectFromTile(attemptingOre.getTile());
-                Sleep.sleepUntil(this::shouldTryMine, 15000); //Is Sleep broke on connection error? shouldTryMine returns true after connection error(tested), but Sleep doesn't stop till timeout. weird.
+                Sleep.sleepUntil(this::shouldTryMine, 15000); //FIX pl NULL STUFF.
             }
         }
 
@@ -262,11 +262,11 @@ public class Main extends AbstractScript implements ItemContainerListener {
     String lastGrab;
     public void drawOreCollection(Graphics g) {
         if (oreCollection == null) {
-            oreCollection = new Hashtable<>();
+                oreCollection = new Hashtable<>();
 
-            for (Ores o: Ores.values()) {
-                oreCollection.put(o, 0);
-            }
+                for (Ores o: Ores.values()) {
+                    oreCollection.put(o, 0);
+                }
         }
 
         int stringWidth = g.getFontMetrics().stringWidth("Adamant: 10");
@@ -289,9 +289,13 @@ public class Main extends AbstractScript implements ItemContainerListener {
                     g.setColor(Color.green);
                     g.drawString("" + count, (int) (Client.getViewportWidth() -265), (int) (Client.getViewportHeight() -290)+(i*15));
                     g.setColor(Color.white);
-                }else {
-                    g.setColor(Color.gray);
+                }else if(count >0) {
+                    g.setColor(Color.white);
                     g.drawString("" + count, (int) (Client.getViewportWidth() -265), (int) (Client.getViewportHeight() -290)+(i*15));
+                    g.setColor(Color.gray);
+                }else {
+                        g.setColor(Color.gray);
+                        g.drawString("" + count, (int) (Client.getViewportWidth() -265), (int) (Client.getViewportHeight() -290)+(i*15));
                 }
             }else {
                 g.setColor(Color.gray);
@@ -303,7 +307,16 @@ public class Main extends AbstractScript implements ItemContainerListener {
         }
 
         g.setColor(Color.white);
-        g.drawString("Ores Mined:", (int) (Client.getViewportWidth() -265 -stringWidth), (int) (Client.getViewportHeight() - 305));
+
+        int totalOresCollected = 0;
+        for (Integer total : oreCollection.values()) {
+            totalOresCollected = totalOresCollected + total;
+        }
+
+        FontMetrics metrics = g.getFontMetrics();
+        int totalStringWidth = metrics.stringWidth("Total Ores Mined: " + totalOresCollected);
+
+        g.drawString("Total Ores Mined: " + totalOresCollected, (int) (Client.getViewportWidth() -265 -totalStringWidth), (int) (Client.getViewportHeight() - 305));
     }
 
 
@@ -311,19 +324,14 @@ public class Main extends AbstractScript implements ItemContainerListener {
     public void onInventoryItemChanged(Item incoming, Item existing) {}
     public void onInventoryItemAdded(Item item) {
         for (Ores ore : Ores.values()) {
-            String realOreName;
-            if (item.getName().contains("Coal")) {
-                realOreName = "Coal";
-            }else if (item.getName().contains("Clay")) {
-                realOreName = "Clay";
-            }else {
-                String[] oreEnumNameSplit = ore.name.split(" ", 2);
-                String[] itemNameSplit = item.getName().split(" ", 2);
 
-                realOreName = oreEnumNameSplit[0] + " " + itemNameSplit[1];
-            }
+            String[] enumSplit = ore.name.split(" ", 2);
 
-            if (realOreName.contains(item.getName())) {
+            String realOreName = enumSplit[0];
+
+            log(item.getName() + ", " + realOreName);
+
+            if (item.getName().contains(realOreName)) {
                 int oldValue = oreCollection.get(ore);
                 oreCollection.put(ore, oldValue + 1);
                 uiHoldTime = System.currentTimeMillis() + 6000;
@@ -360,30 +368,21 @@ public class Main extends AbstractScript implements ItemContainerListener {
             g.setColor(Color.green);
             g.drawString("" + (int)Players.getLocal().getTile().walkingDistance(tile), 5 + stringWidth, Client.getViewportHeight() - 290);
             g.setColor(Color.white);
-            g.drawString("Distance Until Arrival: ", 5, Client.getViewportHeight() - 290);
+            g.drawString("Distance Till Location: ", 5, Client.getViewportHeight() - 290);
         } else {
-            g.drawString("Distance Until Arrival: ", 5, Client.getViewportHeight() - 305);
+            g.drawString("Distance Till Location: ", 5, Client.getViewportHeight() - 305);
         }
     }
 
     public void drawMiningInformation(Graphics g) {
-        String miningLevel = String.format(
-                "Mining Level: %d",
-                Skills.getRealLevel(Skill.MINING)
-        );
-
-        String experienceGainedText = String.format(
-                "Mining Experience: %d (%d per hour)",
-                SkillTracker.getGainedExperience(Skill.MINING),
-                SkillTracker.getGainedExperiencePerHour(Skill.MINING)
-        );
+        //SkillTracker.getGainedExperiencePerHour(Skill.MINING)
 
         g.setColor(Color.white);
         g.drawString("(" + miningLocation.realName + ")", 5, Client.getViewportHeight() - 275);
 
         if (locationTimer != null && miningLocation != null) {
             FontMetrics metrics = g.getFontMetrics();
-            int stringWidth = metrics.stringWidth("Time spent mining: ");
+            int stringWidth = metrics.stringWidth("Time spent mining:");
 
             g.setColor(Color.gray);
             g.drawString("Time spent mining:", 5, Client.getViewportHeight() - 290);
@@ -392,7 +391,12 @@ public class Main extends AbstractScript implements ItemContainerListener {
         }
 
         g.setColor(Color.gray);
-        g.drawString(miningLevel, 5, Client.getViewportHeight() - 345);
-        g.drawString(experienceGainedText, 5, Client.getViewportHeight() - 360);
+
+        FontMetrics metrics = g.getFontMetrics();
+        int experienceStringWidth = metrics.stringWidth("Mining Experience Gained:" + SkillTracker.getGainedExperience(Skill.MINING));
+        int levelStringWidth = metrics.stringWidth("Current Mining Level:" + Skills.getRealLevel(Skill.MINING));
+
+        g.drawString("Mining Experience Gained: " + SkillTracker.getGainedExperience(Skill.MINING), (int) (Client.getViewportWidth() -265 -experienceStringWidth), (int) (Client.getViewportHeight() - 335));
+        g.drawString("Current Mining Level: " + Skills.getRealLevel(Skill.MINING), (int) (Client.getViewportWidth() -265 -levelStringWidth), (int) (Client.getViewportHeight() - 350));
     }
 }
