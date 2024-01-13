@@ -19,6 +19,7 @@ import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.interactive.Player;
+import org.dreambot.api.wrappers.interactive.WalkingQueueSpeed;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class Main extends AbstractScript {
     long nextMineTry;
     Timer locationTimer;
     long timeTillLocationChange;
+    GameObject attemptingLocationObject;
 
 
 
@@ -90,11 +92,22 @@ public class Main extends AbstractScript {
         return hasUsablePickaxe();
     }
 
+    public GameObject getObjectFromTile(Tile tile) {
+        return tile.getTileReference().getObjects()[0];
+    }
+
     private boolean isMining() {
         if (attemptingOre != null) {
             GameObject closest = GameObjects.closest(object -> object.getName().equalsIgnoreCase("rocks") && object.distance(pl.getTile()) <= 2);
             if (closest != null) { //Get mined Rock from attemptingOre Tile instead of trying to find near.
                 if (closest.getTile().equals(attemptingOre.getTile())) {
+
+                    attemptingLocationObject = getObjectFromTile(attemptingOre.getTile());
+                    log(attemptingLocationObject.getName());
+
+                    //log(attemptingOre.getTile().getTileReference().getObjects()[0].getName());
+                    //log(attemptingOre.getTile().getTileReference().getReference());
+
                     nextMineTry = 0;
 
                     return false;
@@ -124,6 +137,8 @@ public class Main extends AbstractScript {
 
         loginReady = true;
     }
+
+    boolean lastAction;
 
     public int readyLoop() {
         if (readyToMine()) {
@@ -161,11 +176,12 @@ public class Main extends AbstractScript {
 
             if (attemptingOre.interact("Mine")) {
                 nextMineTry = System.currentTimeMillis() + Calculations.random(preMineDelay, preMineDelay+300);
+                attemptingLocationObject = getObjectFromTile(attemptingOre.getTile());
                 Sleep.sleepUntil(this::shouldTryMine, 15000); //Is Sleep broke on connection error? shouldTryMine returns true after connection error(tested), but Sleep doesn't stop till timeout. weird.
             }
         }
 
-        return 20;
+        return loopDelay;
     }
 
     @Override
@@ -228,6 +244,39 @@ public class Main extends AbstractScript {
         playerInfo.onPaint(g);
 
         drawMiningInformation(g);
+
+        drawDistanceTo(g, miningLocationTile);
+        drawAttemptingObject(g);
+    }
+
+    public void drawAttemptingObject(Graphics g) {
+        FontMetrics metrics = g.getFontMetrics();
+        int stringWidth = metrics.stringWidth("Currently Attempting Object: ");
+
+        g.setColor(Color.gray);
+
+        if (attemptingLocationObject != null) {
+            g.setColor(Color.green);
+            g.drawString("" + attemptingLocationObject.getName(), 5 + stringWidth, 245);
+            g.setColor(Color.white);
+        }
+
+        g.drawString("Currently Attempting Object: ", 5, 245);
+    }
+
+    public void drawDistanceTo(Graphics g, Tile tile) {
+        FontMetrics metrics = g.getFontMetrics();
+        int stringWidth = metrics.stringWidth("Distance Until Arrival: ");
+
+        g.setColor(Color.darkGray);
+
+        if (Players.getLocal().getTile().walkingDistance(tile) > 25) {
+            g.setColor(Color.green);
+            g.drawString("" + (int)Players.getLocal().getTile().walkingDistance(tile), 5 + stringWidth, 200);
+            g.setColor(Color.white);
+        }
+
+        g.drawString("Distance Until Arrival: ", 5, 200);
     }
 
     public void drawMiningInformation(Graphics g) {
@@ -242,17 +291,18 @@ public class Main extends AbstractScript {
                 SkillTracker.getGainedExperiencePerHour(Skill.MINING)
         );
 
+        g.setColor(Color.white);
+        g.drawString("(" + miningLocation.realName + "):", 5, 230);
+
         if (locationTimer != null && miningLocation != null) {
-            String text = "(" + miningLocation.name() + "): ";
+            //String text = "(" + miningLocation.name() + ")";
 
             FontMetrics metrics = g.getFontMetrics();
-            int stringWidth = metrics.stringWidth(text);
+            int stringWidth = metrics.stringWidth("Time spent mining: ");
 
             g.setColor(Color.gray);
-            g.drawString("Time spent mining at:", 5, 200);
+            g.drawString("Time spent mining:", 5, 215);
             g.setColor(Color.white);
-            g.drawString("(" + miningLocation.name() + "):", 5, 215);
-            g.setColor(Color.green);
             g.drawString("" + locationTimer.formatTime(), 5 + stringWidth, 215);
         }
 

@@ -66,22 +66,24 @@ public class Resources {
     }
 
     public enum Locations {
-        COPPER_LUMBRIDGE(new Area(3227, 3149, 3231, 3145)),
-        COPPER_RIMMINGTON(new Area(2975, 3248, 2980, 3244)),
-        TIN_LUMBRIDGE(new Area(3223, 3149, 3226, 3145)),
-        TIN_RIMMINGTON(new Area(2983, 3238, 2987, 3234)),
-        CLAY_RIMMINGTON(new Area(2985, 3241, 2988, 3238)),
-        IRON_RIMMINGTON(new Area(2967, 3243, 2972, 3236)),
-        IRON2_RIMMINGTON(new Area(2980, 3235, 2983, 3232)),
-        COAL_DRAYNOR(new Area(3145, 3154, 3147, 3148)),
-        GOLD_RIMMINGTON(new Area(2974, 3235, 2978, 3232)),
-        MITHRIL_DRAYNOR(new Area(3144, 3147, 3148, 3144)),
-        ADAMANT_DRAYNOR(new Area(3146, 3148, 3149, 3145));
+        COPPER_LUMBRIDGE(new Area(3227, 3149, 3231, 3145), "South of Lumbridge, Mine"),
+        COPPER_RIMMINGTON(new Area(2975, 3248, 2980, 3244), "North of Rimmington, Mine"),
+        TIN_LUMBRIDGE(new Area(3223, 3149, 3226, 3145), "South of Lumbridge, Mine"),
+        TIN_RIMMINGTON(new Area(2983, 3238, 2987, 3234), "North of Rimmington, Mine"),
+        CLAY_RIMMINGTON(new Area(2985, 3241, 2988, 3238), "North of Rimmington, Mine"),
+        IRON_RIMMINGTON(new Area(2967, 3243, 2972, 3236), "North of Rimmington, Mine"),
+        IRON2_RIMMINGTON(new Area(2980, 3235, 2983, 3232), "North of Rimmington, Mine"),
+        COAL_DRAYNOR(new Area(3145, 3154, 3147, 3148), "South of Draynor, Mine"),
+        GOLD_RIMMINGTON(new Area(2974, 3235, 2978, 3232), "North of Rimmington, Mine"),
+        MITHRIL_DRAYNOR(new Area(3144, 3147, 3148, 3144), "South of Draynor, Mine"),
+        ADAMANT_DRAYNOR(new Area(3146, 3148, 3149, 3145), "South of Draynor, Mine");
 
         public final Area area;
+        public final String realName;
 
-        Locations(Area area) {
+        Locations(Area area, String realName) {
             this.area = area;
+            this.realName = realName;
         }
 
         public static Locations randomArea() {
