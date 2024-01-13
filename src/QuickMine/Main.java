@@ -316,7 +316,7 @@ public class Main extends AbstractScript implements ItemContainerListener {
         FontMetrics metrics = g.getFontMetrics();
         int totalStringWidth = metrics.stringWidth("Total Ores Mined: " + totalOresCollected);
 
-        g.drawString("Total Ores Mined: " + totalOresCollected, (int) (Client.getViewportWidth() -265 -totalStringWidth), (int) (Client.getViewportHeight() - 305));
+        g.drawString("Total Ores Mined: " + totalOresCollected, (int) (Client.getViewportWidth() -258 -totalStringWidth), (int) (Client.getViewportHeight() - 305));
     }
 
 
@@ -396,7 +396,7 @@ public class Main extends AbstractScript implements ItemContainerListener {
         int experienceStringWidth = metrics.stringWidth("Mining Experience Gained:" + SkillTracker.getGainedExperience(Skill.MINING));
         int levelStringWidth = metrics.stringWidth("Current Mining Level:" + Skills.getRealLevel(Skill.MINING));
 
-        g.drawString("Mining Experience Gained: " + SkillTracker.getGainedExperience(Skill.MINING), (int) (Client.getViewportWidth() -265 -experienceStringWidth), (int) (Client.getViewportHeight() - 335));
-        g.drawString("Current Mining Level: " + Skills.getRealLevel(Skill.MINING), (int) (Client.getViewportWidth() -265 -levelStringWidth), (int) (Client.getViewportHeight() - 350));
+        g.drawString("Mining Experience Gained: " + SkillTracker.getGainedExperience(Skill.MINING), (int) (Client.getViewportWidth() -262 -experienceStringWidth), (int) (Client.getViewportHeight() - 335));
+        g.drawString("Current Mining Level: " + Skills.getRealLevel(Skill.MINING), (int) (Client.getViewportWidth() -262 -levelStringWidth), (int) (Client.getViewportHeight() - 350));
     }
 }
