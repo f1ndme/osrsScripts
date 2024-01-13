@@ -17,9 +17,7 @@ import org.dreambot.api.methods.walking.impl.Walking;
 import org.dreambot.api.script.AbstractScript;
 import org.dreambot.api.script.Category;
 import org.dreambot.api.script.ScriptManifest;
-import org.dreambot.api.script.event.impl.InventoryItemEvent;
 import org.dreambot.api.script.listener.ItemContainerListener;
-import org.dreambot.api.utilities.Hash;
 import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
@@ -100,29 +98,71 @@ public class Main extends AbstractScript implements ItemContainerListener {
 
     public GameObject getObjectFromTile(Tile tile) {
         return tile.getTileReference().getObjects()[0];
-    }
+    } //nulkl pointer?
 
-    private boolean isMining() {
-        if (attemptingOre != null) {
-            GameObject closest = GameObjects.closest(object -> object.getName().equalsIgnoreCase("rocks") && object.distance(pl.getTile()) <= 2);
-            if (closest != null) { //Get mined Rock from attemptingOre Tile instead of trying to find near.
-                if (closest.getTile().equals(attemptingOre.getTile())) {
+    public boolean shouldTryMine() {//delicate
+        if (Players.getLocal() == null) {
+            return false;
+        }
 
-                    attemptingLocationObject = getObjectFromTile(attemptingOre.getTile());
-                    //log(attemptingLocationObject.getName());
+        if (!Players.getLocal().exists()) {
+            return false;
+        }
 
-                    nextMineTry = 0;
+        if (Players.getLocal().isMoving()) {
+            return false;
+        }
 
+        if (Calculations.isBefore(nextMineTry)) {
+            if (attemptingOre != null) {
+                if (attemptingOre.getTile() == null) {
                     return false;
+                }//we might not need this. it might also break stuff. lets see. MIGHT NEED TO SET TRUE AN NULL STUFF.
+
+                attemptingLocationObject = getObjectFromTile(attemptingOre.getTile());
+
+                if (attemptingLocationObject != null) {
+                    if (attemptingLocationObject.getName().equalsIgnoreCase("rocks")) {
+                        attemptingOre = null;
+                        nextMineTry = preMineDelay;
+
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        if (attemptingOre != null) {
+            if (attemptingOre.getTile() == null) {
+                return false;
+            }//we might not need this. it might also break stuff. lets see. MIGHT NEED TO SET TRUE AN NULL STUFF.
+
+            attemptingLocationObject = getObjectFromTile(attemptingOre.getTile());
+
+            if (attemptingLocationObject != null) {
+                if (attemptingLocationObject.getName().equalsIgnoreCase("rocks")) {
+                    attemptingOre = null;
+                    nextMineTry = preMineDelay;
+
+                    return true;
                 }
             }
         }
 
-        return pl.isAnimating();
-    }
+        if (!Players.getLocal().isAnimating()) {
+            attemptingOre = null;
+            nextMineTry = preMineDelay;
 
-    public boolean shouldTryMine() {
-        return !Calculations.isBefore(nextMineTry) && !isMining() && !pl.isMoving();
+            return true;
+        }else if (attemptingOre == null) { //and animating?
+            nextMineTry = preMineDelay;
+
+            return true;
+        }
+
+        return false;
     }
 
     public boolean droppingInventory() {
@@ -222,6 +262,15 @@ public class Main extends AbstractScript implements ItemContainerListener {
 
     @Override
     public int onLoop() {
+        log(getRandomManager().getCurrentSolver());
+        log(getRandomManager().getCurrentSolver());
+
+        if (getRandomManager().getCurrentSolver() != null) {
+            log(getRandomManager().getCurrentSolver().getEventString());
+            log(getRandomManager().getCurrentSolver());
+            log(getRandomManager());
+        }
+
         pl = Players.getLocal();
         if (pl == null) return loopDelay;
 
