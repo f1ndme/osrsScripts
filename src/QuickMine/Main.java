@@ -3,6 +3,8 @@ package QuickMine;
 import QuickMine.ui.PlayerInfo;
 import QuickMine.ui.ScriptTime;
 import org.dreambot.api.Client;
+import org.dreambot.api.ClientSettings;
+import org.dreambot.api.data.ClientLayout;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.interactive.GameObjects;
@@ -142,6 +144,10 @@ public class Main extends AbstractScript implements ItemContainerListener {
     boolean lastAction;
 
     public int readyLoop() {
+        if (ClientSettings.getClientLayout() != ClientLayout.RESIZABLE_CLASSIC) {
+            ClientSettings.setClientLayout(ClientLayout.RESIZABLE_CLASSIC);
+        }
+
         if (readyToMine()) {
             if (!atMiningLocation) {
                 //go to mining location.
@@ -281,23 +287,23 @@ public class Main extends AbstractScript implements ItemContainerListener {
             if (lastGrab != null) {
                 if (display.contains(lastGrab) && Calculations.isBefore(uiHoldTime)) {
                     g.setColor(Color.green);
-                    g.drawString("" + count, (int) (Client.getViewportWidth() - (Client.getViewportWidth() * 0.420)) + stringWidth, (int) (Client.getViewportHeight() - (Client.getViewportHeight() * 0.500) - 34)+(i*15));
+                    g.drawString("" + count, (int) (Client.getViewportWidth() -265), (int) (Client.getViewportHeight() -290)+(i*15));
                     g.setColor(Color.white);
                 }else {
                     g.setColor(Color.gray);
-                    g.drawString("" + count, (int) (Client.getViewportWidth() - (Client.getViewportWidth() * 0.420)) + stringWidth, (int) (Client.getViewportHeight() - (Client.getViewportHeight() * 0.500) - 34)+(i*15));
+                    g.drawString("" + count, (int) (Client.getViewportWidth() -265), (int) (Client.getViewportHeight() -290)+(i*15));
                 }
             }else {
                 g.setColor(Color.gray);
-                g.drawString("" + count, (int) (Client.getViewportWidth() - (Client.getViewportWidth() * 0.420)) + stringWidth, (int) (Client.getViewportHeight() - (Client.getViewportHeight() * 0.500) - 34)+(i*15));
+                g.drawString("" + count, (int) (Client.getViewportWidth() -265), (int) (Client.getViewportHeight() -290)+(i*15));
             }
 
-            g.drawString(display, (int) (Client.getViewportWidth() - (Client.getViewportWidth() * 0.420)), (int) (Client.getViewportHeight() - (Client.getViewportHeight() * 0.500) - 34)+(i*15));
+            g.drawString(display, (int) (Client.getViewportWidth() -265 -stringWidth), (int) (Client.getViewportHeight() -290)+(i*15));
             i++;
         }
 
         g.setColor(Color.white);
-        g.drawString("Ores Mined:", (int) (Client.getViewportWidth() - (Client.getViewportWidth() * 0.420)), (int) (Client.getViewportHeight() - (Client.getViewportHeight() * 0.500) - 50));
+        g.drawString("Ores Mined:", (int) (Client.getViewportWidth() -265 -stringWidth), (int) (Client.getViewportHeight() - 305));
     }
 
 

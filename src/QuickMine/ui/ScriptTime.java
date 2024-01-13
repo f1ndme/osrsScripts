@@ -117,8 +117,8 @@ public class ScriptTime {
         frameColor = new Color(80, 80, 80, 160);
 
         if (Client.isLoggedIn() && !randomManager.isSolving()) {
-            originX = (int) (ScrW - (ScrW * 0.354)); //TopRight ChatBox X
-            originY = (int) (ScrH - (ScrH * 0.308)); //TopRight ChatBox Y
+            originX = 491; //TopRight ChatBox X
+            originY = (int) (ScrH - 157); //TopRight ChatBox Y
 
             loginState = true; //is this even doing anything. cant think
         } else {
