@@ -44,7 +44,7 @@ public class PlayerInfo {
 
         if (Client.isLoggedIn()) {
             iconX = 8;
-            iconY = (int) (ScrH - (ScrH * 0.308) - iconSize*1.5 -14);
+            iconY = (int) (ScrH - 220);
 
             loginState = true; //is this even doing anything. cant think
         } else {

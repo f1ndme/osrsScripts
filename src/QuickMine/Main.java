@@ -343,11 +343,11 @@ public class Main extends AbstractScript implements ItemContainerListener {
 
         if (attemptingLocationObject != null) {
             g.setColor(Color.green);
-            g.drawString("" + attemptingLocationObject.getName(), 5 + stringWidth, 245);
+            g.drawString("" + attemptingLocationObject.getName(), 5 + stringWidth, Client.getViewportHeight() - 260);
             g.setColor(Color.white);
         }
 
-        g.drawString("Currently Attempting Object: ", 5, 245);
+        g.drawString("Currently Attempting Object: ", 5, Client.getViewportHeight() - 260);
     }
 
     public void drawDistanceTo(Graphics g, Tile tile) {
@@ -358,11 +358,11 @@ public class Main extends AbstractScript implements ItemContainerListener {
 
         if (Players.getLocal().getTile().walkingDistance(tile) > 25) {
             g.setColor(Color.green);
-            g.drawString("" + (int)Players.getLocal().getTile().walkingDistance(tile), 5 + stringWidth, 215);
+            g.drawString("" + (int)Players.getLocal().getTile().walkingDistance(tile), 5 + stringWidth, Client.getViewportHeight() - 290);
             g.setColor(Color.white);
-            g.drawString("Distance Until Arrival: ", 5, 215);
+            g.drawString("Distance Until Arrival: ", 5, Client.getViewportHeight() - 290);
         } else {
-            g.drawString("Distance Until Arrival: ", 5, 200);
+            g.drawString("Distance Until Arrival: ", 5, Client.getViewportHeight() - 305);
         }
     }
 
@@ -379,16 +379,16 @@ public class Main extends AbstractScript implements ItemContainerListener {
         );
 
         g.setColor(Color.white);
-        g.drawString("(" + miningLocation.realName + ")", 5, 230);
+        g.drawString("(" + miningLocation.realName + ")", 5, Client.getViewportHeight() - 275);
 
         if (locationTimer != null && miningLocation != null) {
             FontMetrics metrics = g.getFontMetrics();
             int stringWidth = metrics.stringWidth("Time spent mining: ");
 
             g.setColor(Color.gray);
-            g.drawString("Time spent mining:", 5, 215);
+            g.drawString("Time spent mining:", 5, Client.getViewportHeight() - 290);
             g.setColor(Color.white);
-            g.drawString("" + locationTimer.formatTime(), 5 + stringWidth, 215);
+            g.drawString("" + locationTimer.formatTime(), 5 + stringWidth, Client.getViewportHeight() - 290);
         }
 
         g.setColor(Color.gray);
