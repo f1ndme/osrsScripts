@@ -100,6 +100,10 @@ public class Main extends AbstractScript implements ItemContainerListener {
     }
 
     public GameObject getObjectFromTile(Tile tile) {
+        if (tile.getTileReference() == null) {
+            return null;
+        }
+
         if (tile.getTileReference().getObjects().length <= 0) {
             return null;
         }
