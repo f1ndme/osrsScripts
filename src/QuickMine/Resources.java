@@ -162,7 +162,7 @@ public class Resources {
                 for(int k=0; k < allMineableOres().size(); k++) {
                     Ores minableOre = allMineableOres().get(k);
 
-                    if (availableOres.get(i).getName().equalsIgnoreCase(minableOre.name)) {
+                    if (availableOres.get(i).getName().equalsIgnoreCase(minableOre.name) && minableOre.level < Skills.getRealLevel(Skill.MINING) && minableOre.level > 5) { //>5 gets iron/coal/gold/ect...
                         minableOresNear.add(availableOres.get(i));
                     }
                 }

@@ -33,9 +33,9 @@ import static QuickMine.Resources.Pickaxes.hasUsablePickaxe;
 
 @ScriptManifest(category = Category.MINING, name = "Quick Mine 2.1", description = "Mines stuff.", author = "find me", version = 1.0)
 public class Main extends AbstractScript implements ItemContainerListener {
-    final int preWalkDelay = 1501;
+    final int preWalkDelay = Calculations.random(300, 601);
     final int miningTolerance = 14; //How far can we see ores.
-    final int preMineDelay = 4801; //Extra high to reach far away ores, resets on completed mine though. Could adjust on isRunning.
+    final int preMineDelay = Calculations.random(300, 601); //Extra high to reach far away ores, resets on completed mine though. Could adjust on isRunning.
     final long locationChangeMinTime = 10 * 60000; //Minutes
     final long locationChangeMaxTime = 15 * 60000; //Minutes
     final int loopDelay = 100;
@@ -97,10 +97,14 @@ public class Main extends AbstractScript implements ItemContainerListener {
     }
 
     public GameObject getObjectFromTile(Tile tile) {
-        return tile.getTileReference().getObjects()[0];
-    } //nulkl pointer?
+        if (tile.getTileReference().getObjects().length <= 0) {
+            return null;
+        }
 
-    public boolean shouldTryMine() {//delicate
+        return tile.getTileReference().getObjects()[0];
+    } //fixed i think? no more error here?
+
+    public boolean shouldTryMine() {//delicate lol
         if (Players.getLocal() == null) {
             return false;
         }
@@ -123,6 +127,9 @@ public class Main extends AbstractScript implements ItemContainerListener {
 
                 if (attemptingLocationObject != null) {
                     if (attemptingLocationObject.getName().equalsIgnoreCase("rocks")) {
+                        retryRequest = false;
+                        allRetryRequests = 0;
+
                         attemptingOre = null;
                         nextMineTry = preMineDelay;
 
@@ -143,6 +150,9 @@ public class Main extends AbstractScript implements ItemContainerListener {
 
             if (attemptingLocationObject != null) {
                 if (attemptingLocationObject.getName().equalsIgnoreCase("rocks")) {
+                    retryRequest = false;
+                    allRetryRequests = 0;
+
                     attemptingOre = null;
                     nextMineTry = preMineDelay;
 
@@ -152,7 +162,13 @@ public class Main extends AbstractScript implements ItemContainerListener {
         }
 
         if (!Players.getLocal().isAnimating()) {
-            attemptingOre = null;
+            if (attemptingOre != null) {
+                //retry same? already checked, not rocks.
+
+                retryRequest = true;
+                return true;
+            }
+
             nextMineTry = preMineDelay;
 
             return true;
@@ -182,6 +198,9 @@ public class Main extends AbstractScript implements ItemContainerListener {
     }
 
     boolean lastAction;
+    boolean retryRequest;
+    int allRetryRequests;
+    final int maxRetryRequests = 3;
 
     public int readyLoop() {
         //if (ClientSettings.getClientLayout() != ClientLayout.RESIZABLE_CLASSIC) {
@@ -217,8 +236,49 @@ public class Main extends AbstractScript implements ItemContainerListener {
                 return loopDelay;
             }
 
-            int randomKey = Calculations.random(0, minableOresNear.size());
-            attemptingOre = minableOresNear.get(randomKey);
+            if (retryRequest) {
+                //attemptingOre is valid?
+                if (allRetryRequests > maxRetryRequests) {
+                    log("No More Retry Requests... Finding new target.");
+                    attemptingOre = null;
+                    nextMineTry = preMineDelay;
+
+                    retryRequest = false;
+                    allRetryRequests = 0;
+                }else {
+                    log("Retry Request...");
+
+                    if (Players.getLocal().isAnimating()) {
+                        retryRequest = false;
+                        allRetryRequests = 0;
+
+                        return loopDelay;
+                    }
+
+                    if (attemptingOre == null) {
+                        retryRequest = false;
+                        allRetryRequests = 0;
+
+                        return loopDelay;
+                    }
+
+                    if (attemptingOre.interact("Mine")) {
+                        nextMineTry = System.currentTimeMillis() + Calculations.random(preMineDelay, preMineDelay+300);
+                        attemptingLocationObject = getObjectFromTile(attemptingOre.getTile());
+                        Sleep.sleepUntil(this::shouldTryMine, 15000); //FIX pl NULL STUFF.
+                    }
+
+                    Sleep.sleep(Calculations.random(601, 1201));
+
+                    allRetryRequests++;
+
+                    return loopDelay;
+                }
+            }else {
+                int randomKey = Calculations.random(0, minableOresNear.size());
+                attemptingOre = minableOresNear.get(randomKey);
+            }
+
             if (attemptingOre == null) return loopDelay;
 
             if (attemptingOre.interact("Mine")) {
