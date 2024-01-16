@@ -10,7 +10,10 @@ import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.script.TaskNode;
 import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
+import org.dreambot.api.wrappers.interactive.Model;
+import org.dreambot.api.wrappers.interactive.Player;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +29,7 @@ public class Miner extends TaskNode {
 
 
     public GameObject randomReachable(GameObject... exluding) {
-        return getReachable(exluding).get(Calculations.random(0, getReachable(exluding).size()));
+        return getReachable(exluding).get(Calculations.random(0, getReachable(exluding).size()-1));
     }
     public GameObject closestReachable() {
         GameObject winningObject = null;
@@ -56,6 +59,20 @@ public class Miner extends TaskNode {
         return winningObject;
     }
 
+    public GameObject closestSmartType() { //brokenish
+        GameObject winningObject = null;
+        double winner = 1000000;
+
+        for (GameObject obj : getSmartTypes()) {
+            if (obj.distance(Players.getLocal().getTile()) < winner) {
+                winner = obj.distance(Players.getLocal().getTile());
+                winningObject = obj;
+            }
+        }
+
+        return winningObject;
+    }
+
     public GameObject findWinningOre() {
         GameObject winningObject = closestReachable();
 
@@ -69,6 +86,34 @@ public class Miner extends TaskNode {
         return winningObject;
     }
 
+    public List<GameObject> getSmartTypes() { //brokenish
+        GameObject target = targetNode;
+
+        List<GameObject> sameTypes = GameObjects.all(object -> object.hasAction("Mine") && object.distance(Players.getLocal().getTile()) <= reachDistance && object.getModelColors() != null && object.getName().equals(target.getName()));
+        List<GameObject> toBeRemoved = new ArrayList<>();
+
+        for (GameObject node : sameTypes) {
+            for (Player pl : Players.all()) {
+                log(pl.getAnimation());
+                if (pl != Players.getLocal()) {
+                    if (pl.getTile().distance(node.getTile()) < 3) {
+                        if (pl.isAnimating()) {
+                            toBeRemoved.add(node);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!toBeRemoved.isEmpty() && toBeRemoved.size() != sameTypes.size()) {
+            for (GameObject obj : toBeRemoved) {
+                sameTypes.remove(obj);
+            }
+        }
+
+        return sameTypes;
+    }
+
     public List<GameObject> getReachable(GameObject... excluding) {//thic
 
         String exclusionName = "";
@@ -79,7 +124,7 @@ public class Miner extends TaskNode {
         }
 
         if (!exclusionName.equals("")) {
-            log("Excluding: " + exclusionName);
+            //log("Excluding: " + exclusionName);
         }
 
         List<GameObject> reachable = new ArrayList<>();

@@ -3,10 +3,15 @@ package DoStuff.Mine;
 import DoStuff.Mine.Tasks.*;
 import org.dreambot.api.Client;
 import org.dreambot.api.methods.Calculations;
+import org.dreambot.api.methods.interactive.GameObjects;
+import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.script.impl.TaskScript;
+import org.dreambot.api.wrappers.interactive.GameObject;
+import org.dreambot.api.wrappers.interactive.Model;
+import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.Item;
 
 import java.awt.*;
@@ -169,6 +174,22 @@ public class MineManager extends TaskScript {
         drawOperatingTasks(g);
         int offset = drawLocations(g);
         drawOres(g, offset);
+        drawTests(g);
+    }
+
+    public void drawTests(Graphics g) {
+        if (miner != null) {
+            if (miner.targetNode != null && miner.targetNode.getModel() != null) {
+                GameObject target = miner.targetNode;
+
+                List<GameObject> sameTypes = GameObjects.all(object -> object.hasAction("Mine") && object.getModelColors() == null && object.getName().equals(target.getName()));
+
+                for (GameObject node : sameTypes) {
+                    g.setColor(Color.PINK);
+                    node.getModel().drawWireFrame(g);
+                }
+            }
+        }
     }
 
 
