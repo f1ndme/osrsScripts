@@ -128,7 +128,6 @@ public class MineManager extends TaskScript {
 
             if (item.getName().contains(oreFirstName)) {
                 if (!oreCollection.containsKey(ore)) { //create if not exist.
-                    log("new");
                     oreCollection.put(ore, 0);
                 }
 

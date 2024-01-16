@@ -22,11 +22,11 @@ public class Miner extends TaskNode {
     public GameObject targetNode;
     public int reachDistance = 14;
     public long nextBounce = 0;
-    public long bounceDelay = 20000;
+    public long bounceDelay = 60000;
 
 
-    public GameObject randomReachable() {
-        return getReachable().get(Calculations.random(0, getReachable().size()));
+    public GameObject randomReachable(GameObject... exluding) {
+        return getReachable(exluding).get(Calculations.random(0, getReachable(exluding).size()));
     }
     public GameObject closestReachable() {
         GameObject winningObject = null;
@@ -63,27 +63,38 @@ public class Miner extends TaskNode {
             nextBounce = System.currentTimeMillis() + bounceDelay;
 
             //winningObject = furthestReachable();
-            winningObject = randomReachable();
+            winningObject = randomReachable(targetNode);
         }
 
         return winningObject;
     }
 
-    public List<GameObject> getReachable() {//thic
+    public List<GameObject> getReachable(GameObject... excluding) {//thic
+
+        String exclusionName = "";
+        if (excluding.length > 0) {
+            if (excluding[0] != null) {
+                exclusionName = excluding[0].getName();
+            }
+        }
+
+        if (!exclusionName.equals("")) {
+            log("Excluding: " + exclusionName);
+        }
+
         List<GameObject> reachable = new ArrayList<>();
 
         for (GameObject object : GameObjects.all()) {
             if (object.hasAction("Mine")) {
-                if (object.distance(Players.getLocal().getTile()) <= reachDistance) {
-                    if (object.getModelColors() != null) {
-
-                        for (Ores ore : Ores.allMinable()) {
-                            if (ore.name.equals(object.getName())) {
-                                reachable.add(object);
+                if (!object.getName().equals(exclusionName)) {
+                    if (object.distance(Players.getLocal().getTile()) <= reachDistance) {
+                        if (object.getModelColors() != null) {
+                            for (Ores ore : Ores.allMinable()) {
+                                if (ore.name.equals(object.getName())) {
+                                    reachable.add(object); //takeoff
+                                }
                             }
                         }
-
-
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package DoStuff.Mine.Tasks;
 
 import DoStuff.Mine.MineManager;
+import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.interactive.Players;
@@ -12,7 +13,7 @@ public class Banker extends TaskNode {
     public Banker(MineManager manager) {
         this.manager = manager;
     }
-                  @Override
+    @Override
     public boolean accept() {
         if (Players.getLocal() == null) {
             log("Player is null");
@@ -35,8 +36,18 @@ public class Banker extends TaskNode {
         return true;
     }
 
+    boolean randomDropper;
     @Override
     public int execute() {
+        if (!randomDropper) {
+            if (Calculations.chance(0, 4)) {
+                log("Chanced drop. lul");
+                Sleep.sleepUntil(this::droppedInventory, 15000);
+                return 100;
+            }
+            randomDropper = true;
+        }
+
         Sleep.sleepUntil(this::bankScreenOpen, this::playerMoving, 15000, 601);
 
         if (bankScreenOpen()) {
@@ -45,6 +56,7 @@ public class Banker extends TaskNode {
             manager.positioner.targetLocation = null;
             manager.positioner.alreadyArrived = false; //lol fck
             manager.miner.targetNode = null;
+            randomDropper = false;
         }
 
         return 100;
@@ -54,7 +66,13 @@ public class Banker extends TaskNode {
 
 
 
+    public boolean droppedInventory() {
+        if (Inventory.dropAll(item -> item.getName().contains("ore") || item.getName().contains("Clay") || item.getName().contains("Coal") || item.getName().contains("Uncut") || item.getName().contains("Clue") || item.getName().contains("scroll"))) {
+            return false;
+        }
 
+        return true;
+    }
 
     public boolean inventoryDeposited() {
         if (containsOres()) {
