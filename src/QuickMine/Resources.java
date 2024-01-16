@@ -103,8 +103,8 @@ public class Resources {
 
 
     public enum Ores {
-        COPPER("Copper rocks", 1, Arrays.asList(Locations.COPPER_RIMMINGTON, Locations.COPPER_RIMMINGTON) ), //no lumby atm
-        TIN("Tin rocks", 1, Arrays.asList(Locations.TIN_RIMMINGTON, Locations.TIN_RIMMINGTON) ), //no lumby atm
+        COPPER("Copper rocks", 1, Arrays.asList(Locations.COPPER_LUMBRIDGE, Locations.COPPER_RIMMINGTON) ), //no lumby atm
+        TIN("Tin rocks", 1, Arrays.asList(Locations.TIN_LUMBRIDGE, Locations.TIN_RIMMINGTON) ), //no lumby atm
         CLAY("Clay rocks", 1, Arrays.asList(Locations.CLAY_RIMMINGTON, Locations.CLAY_RIMMINGTON) ),
         IRON("Iron rocks", 15, Arrays.asList(Locations.IRON_RIMMINGTON, Locations.IRON2_RIMMINGTON) ),
         COAL("Coal rocks", 30, Arrays.asList(Locations.COAL_DRAYNOR, Locations.COAL_DRAYNOR) ),
@@ -162,7 +162,7 @@ public class Resources {
                 for(int k=0; k < allMineableOres().size(); k++) {
                     Ores minableOre = allMineableOres().get(k);
 
-                    if (availableOres.get(i).getName().equalsIgnoreCase(minableOre.name) && minableOre.level < Skills.getRealLevel(Skill.MINING) && minableOre.level > 5) { //>5 gets iron/coal/gold/ect...
+                    if (availableOres.get(i).getName().equalsIgnoreCase(minableOre.name) && minableOre.level <= Skills.getRealLevel(Skill.MINING) && minableOre.level > 0) { //>5 gets iron/coal/gold/ect...
                         minableOresNear.add(availableOres.get(i));
                     }
                 }

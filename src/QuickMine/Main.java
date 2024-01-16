@@ -36,7 +36,7 @@ import static QuickMine.Resources.Pickaxes.hasUsablePickaxe;
 
 @ScriptManifest(category = Category.MINING, name = "Quick Mine 2.1", description = "Mines stuff.", author = "find me", version = 1.0)
 public class Main extends AbstractScript implements ItemContainerListener {
-    final int miningTolerance = 14; //How far can we see ores.
+    final int miningTolerance = 9; //How far can we see ores.
     final long locationChangeMinTime = 10 * 60000; //Minutes
     final long locationChangeMaxTime = 15 * 60000; //Minutes
     final int preMineDelay = Calculations.random(1201, 1801); //seems to retry less with this higher
@@ -91,7 +91,9 @@ public class Main extends AbstractScript implements ItemContainerListener {
         atMiningLocation = false;
         locationTimer = null;
         miningLocation = Locations.randomMinableLocation();
+
         miningLocationTile = miningLocation.area.getRandomTile();
+        //miningLocationTile = Players.getLocal().getTile();
 
         //log("Mining location set to: " + miningLocation.name());
     }
@@ -112,28 +114,34 @@ public class Main extends AbstractScript implements ItemContainerListener {
     } //fixed i think? no more error here?
 
     public boolean shouldTryMine() {//delicate lol
-        if (Players.getLocal() == null) {
+        if (Players.getLocal() == null) { //is this ever null?
+            log("Players.getLocal() was NULL...");
             return false;
         }
 
         if (!Players.getLocal().exists()) {
+            log("Players.getLocal().exists() IT DOESNT...");
             return false;
         }
 
         if (Players.getLocal().isMoving()) {
+            log("We are moving, likely to mine, don't retry mining yet.");
             return false;
         }
 
-        if (Calculations.isBefore(nextMineTry)) {
-            if (attemptingOre != null) {
-                if (attemptingOre.getTile() == null) {
+        if (Calculations.isBefore(nextMineTry)) { //PRE next mine try tick.
+
+            if (attemptingOre != null) { //Does ORE still exists?
+
+                if (attemptingOre.getTile() == null) { //Does Ore TILE still exists?
                     return false;
                 }//we might not need this. it might also break stuff. lets see. MIGHT NEED TO SET TRUE AN NULL STUFF.
 
-                attemptingLocationObject = getObjectFromTile(attemptingOre.getTile());
+                attemptingLocationObject = getObjectFromTile(attemptingOre.getTile()); //OBJECT @ Tile, could be null.
 
-                if (attemptingLocationObject != null) {
-                    if (attemptingLocationObject.getName().equalsIgnoreCase("rocks")) {
+                if (attemptingLocationObject != null) { //VALID objects to check?
+
+                    if (attemptingLocationObject.getName().equalsIgnoreCase("rocks")) { //Rocks? lets RETRY mine.
                         retryRequest = false;
                         allRetryRequests = 0;
 
@@ -148,15 +156,16 @@ public class Main extends AbstractScript implements ItemContainerListener {
             return false;
         }
 
-        if (attemptingOre != null) {
-            if (attemptingOre.getTile() == null) {
+        if (attemptingOre != null) { //POSTTTTTTTTTT 'nextMine', ATTEMPTING still exists, do checks.
+
+            if (attemptingOre.getTile() == null) { //Does Ore TILE still exists?
                 return false;
             }//we might not need this. it might also break stuff. lets see. MIGHT NEED TO SET TRUE AN NULL STUFF.
 
-            attemptingLocationObject = getObjectFromTile(attemptingOre.getTile());
+            attemptingLocationObject = getObjectFromTile(attemptingOre.getTile()); //OBJECT @ Tile, could be null.
 
-            if (attemptingLocationObject != null) {
-                if (attemptingLocationObject.getName().equalsIgnoreCase("rocks")) {
+            if (attemptingLocationObject != null) { //VALID objects to check?
+                if (attemptingLocationObject.getName().equalsIgnoreCase("rocks")) { //Rocks? lets RETRY mine.
                     retryRequest = false;
                     allRetryRequests = 0;
 
@@ -168,27 +177,29 @@ public class Main extends AbstractScript implements ItemContainerListener {
             }
         }
 
-        if (!Players.getLocal().isAnimating()) {
-            if (attemptingOre != null) {
+        //Check NOT Animating, Attempting Null not known yet.
+        if (!Players.getLocal().isAnimating()) { //NULL ORE by this point? or it just exists, not dead yet.
+
+            if (attemptingOre != null) { //It still exists, could be aproaching, could be long mine.
                 //retry same? already checked, not rocks.
 
                 retryRequest = true;
                 return true;
             }
 
-            nextMineTry = preMineDelay;
+            nextMineTry = preMineDelay; //ore is null, we are animating, retry i guess?
 
             return true;
-        }else if (attemptingOre == null) { //and animating?
-            nextMineTry = preMineDelay;
+        }else if (attemptingOre == null) { //ORE is null, and we are not animating.
+            nextMineTry = preMineDelay; //definitely switch. no ore, no anim.
 
             return true;
         }
 
-        return false;
+        return false; //is animating, ore not null, keep waiting... Otherwise dies @ !animating check.
     }
 
-    public boolean droppingInventory() {
+    public boolean droppingInventory() { //dont like getting stuck in loop if pause.
         return Inventory.dropAll(item -> item.getName().contains("ore") || item.getName().contains("Clay") || item.getName().contains("Coal") || item.getName().contains("Uncut") || item.getName().contains("Clue") || item.getName().contains("scroll"));
     }
 
@@ -328,16 +339,7 @@ public class Main extends AbstractScript implements ItemContainerListener {
     }
 
     @Override
-    public int onLoop() {
-        log(getRandomManager().getCurrentSolver());
-        log(getRandomManager().getCurrentSolver());
-
-        if (getRandomManager().getCurrentSolver() != null) {
-            log(getRandomManager().getCurrentSolver().getEventString());
-            log(getRandomManager().getCurrentSolver());
-            log(getRandomManager());
-        }
-
+    public int onLoop() { //figure how to print solving info. on solving.
         pl = Players.getLocal();
         if (pl == null) return loopDelay;
 
@@ -357,7 +359,7 @@ public class Main extends AbstractScript implements ItemContainerListener {
     }
 
     @Override
-    public void onPaint(Graphics g) {
+    public void onPaint(Graphics g) { //clean this shit up.
         if (scriptTime != null) {
             scriptTime.onPaint(g);
         }
