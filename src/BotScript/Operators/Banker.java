@@ -51,7 +51,7 @@ public class Banker extends Operator {
     @Override
     public int execute() {
         if (!randomDropper) {
-            if (!Calculations.chance(0, 4)) {
+            if (!Calculations.chance(0, 2)) {
                 log("Chanced drop. lul");
                 Sleep.sleepUntil(this::droppedInventory, 15000);
                 return 100;

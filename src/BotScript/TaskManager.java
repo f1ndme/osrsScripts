@@ -44,7 +44,7 @@ public class TaskManager extends TaskScript {
         paint(g);
         postPaint(g);
 
-        drawOperatingTasks(g);
+        //drawOperatingTasks(g);
     }
 
     public void prePaint(Graphics g) {
