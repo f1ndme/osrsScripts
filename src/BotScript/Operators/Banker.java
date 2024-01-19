@@ -1,18 +1,30 @@
-package DoStuff.Mine.Tasks;
+package BotScript.Operators;
 
-import DoStuff.Mine.MineManager;
+import BotScript.TaskManager;
+import BotScript.UIManager;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.Bank;
 import org.dreambot.api.methods.interactive.Players;
-import org.dreambot.api.script.TaskNode;
 import org.dreambot.api.utilities.Sleep;
 
-public class Banker extends TaskNode {
-    public MineManager manager;
-    public Banker(MineManager manager) {
-        this.manager = manager;
+public class Banker extends Operator {
+    public TaskManager taskManager;
+    boolean randomDropper;
+    public UIManager uiManager;
+    public Banker(TaskManager taskManager, UIManager uiManager) {
+        this.taskManager = taskManager;
+        this.uiManager = uiManager;
+
+
     }
+
+
+
+
+
+
+
     @Override
     public boolean accept() {
         if (Players.getLocal() == null) {
@@ -36,11 +48,10 @@ public class Banker extends TaskNode {
         return true;
     }
 
-    boolean randomDropper;
     @Override
     public int execute() {
         if (!randomDropper) {
-            if (Calculations.chance(0, 4)) {
+            if (!Calculations.chance(0, 4)) {
                 log("Chanced drop. lul");
                 Sleep.sleepUntil(this::droppedInventory, 15000);
                 return 100;
@@ -53,14 +64,17 @@ public class Banker extends TaskNode {
         if (bankScreenOpen()) {
             Sleep.sleepUntil(this::inventoryDeposited, 15000);
 
-            manager.positioner.targetLocation = null;
-            manager.positioner.alreadyArrived = false; //lol fck
-            manager.miner.targetNode = null;
+            taskManager.positioner.targetLocation = null;
+            taskManager.positioner.alreadyArrived = false; //lol fck
+            taskManager.miner.targetNode = null;
             randomDropper = false;
         }
 
         return 100;
     }
+
+
+
 
 
 
@@ -88,7 +102,7 @@ public class Banker extends TaskNode {
     }
 
     public boolean bankScreenOpen() {
-        return Bank.open(Bank.getClosestBankLocation(true));
+        return Bank.open(Bank.getClosestBankLocation(false));
     }
 
     public boolean playerMoving() {
