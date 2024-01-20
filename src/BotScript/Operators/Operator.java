@@ -1,12 +1,13 @@
 package BotScript.Operators;
 
+import BotScript.TaskManager;
+import BotScript.UIManager;
 import org.dreambot.api.script.TaskNode;
 import org.dreambot.api.wrappers.items.Item;
 
 import java.awt.*;
 
 public class Operator extends TaskNode {
-
     @Override
     public boolean accept() {
 

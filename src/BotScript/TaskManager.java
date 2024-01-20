@@ -4,7 +4,6 @@ import BotScript.Operators.Banker;
 import BotScript.Operators.Miner;
 import BotScript.Operators.Operator;
 import BotScript.Operators.Positioner;
-import org.dreambot.api.Client;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
@@ -17,10 +16,10 @@ import java.util.*;
 import java.util.List;
 
 public class TaskManager extends TaskScript {
+    public UIManager uiManager;
     public Positioner positioner;
     public Miner miner;
     public Banker banker;
-    public UIManager uiManager;
     TaskManager(UIManager uiManager) {
         this.uiManager = uiManager;
 
@@ -88,74 +87,7 @@ public class TaskManager extends TaskScript {
 
 
 
-    public void drawOperatingTasks(Graphics g) {
-        if (positioner != null) {
-            g.setColor(Color.white);
-            g.drawString("Positioner", 10, Client.getViewportHeight() - 325);
 
-            if (getLastTaskNode() == positioner) {
-                FontMetrics metrics = g.getFontMetrics();
-                int stringWidth = metrics.stringWidth("Positioner ");
-
-                g.setColor(Color.yellow);
-                g.drawString("lastActive", 10 + stringWidth, Client.getViewportHeight() - 325);
-            }
-
-            if (positioner.accept()) {
-                FontMetrics metrics = g.getFontMetrics();
-                int stringWidth = metrics.stringWidth("Positioner ");
-                if (getLastTaskNode() == positioner) {
-                    stringWidth = metrics.stringWidth("Positioner lastActive ");
-                }
-                g.setColor(Color.green);
-                g.drawString("Operating...", 10 + stringWidth, Client.getViewportHeight() - 325);
-            }
-        }
-
-        if (miner != null) {
-            g.setColor(Color.white);
-            g.drawString("Miner", 10, Client.getViewportHeight() - 340);
-
-            if (getLastTaskNode() == miner) {
-                FontMetrics metrics = g.getFontMetrics();
-                int stringWidth = metrics.stringWidth("Miner ");
-                g.setColor(Color.yellow);
-                g.drawString("lastActive", 10 + stringWidth, Client.getViewportHeight() - 340);
-            }
-
-            if (miner.accept()) {
-                FontMetrics metrics = g.getFontMetrics();
-                int stringWidth = metrics.stringWidth("Miner ");
-                if (getLastTaskNode() == miner) {
-                    stringWidth = metrics.stringWidth("Miner lastActive ");
-                }
-                g.setColor(Color.green);
-                g.drawString("Operating...", 10 + stringWidth, Client.getViewportHeight() - 340);
-            }
-        }
-
-        if (banker != null) {
-            g.setColor(Color.white);
-            g.drawString("Banker", 10, Client.getViewportHeight() - 355);
-
-            if (getLastTaskNode() == banker) {
-                FontMetrics metrics = g.getFontMetrics();
-                int stringWidth = metrics.stringWidth("Banker ");
-                g.setColor(Color.yellow);
-                g.drawString("lastActive", 10 + stringWidth, Client.getViewportHeight() - 355);
-            }
-
-            if (banker.accept()) {
-                FontMetrics metrics = g.getFontMetrics();
-                int stringWidth = metrics.stringWidth("Banker ");
-                if (getLastTaskNode() == banker) {
-                    stringWidth = metrics.stringWidth("Banker lastActive ");
-                }
-                g.setColor(Color.green);
-                g.drawString("Operating...", 10 + stringWidth, Client.getViewportHeight() - 355);
-            }
-        }
-    }
 
 
 

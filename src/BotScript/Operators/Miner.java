@@ -60,7 +60,7 @@ public class Miner extends Operator implements UIManager.TextCommands {
             accessibleNodes.add(ore.name);
         }
 
-        itemListShouldUpdate = true;
+        miningInformationShouldRebuild = true;
     }
 
 
@@ -91,7 +91,7 @@ public class Miner extends Operator implements UIManager.TextCommands {
             }
         }
 
-        itemListShouldUpdate = true;
+        miningInformationShouldRebuild = true;
     }
 
     public void onTextCommandPressed(int id) {}
@@ -102,7 +102,7 @@ public class Miner extends Operator implements UIManager.TextCommands {
             exclusionList.remove(uiManager.allDualTexts.get(id).text);
         }
 
-        itemListShouldUpdate = true;
+        miningInformationShouldRebuild = true;
     }
 
 
@@ -110,7 +110,7 @@ public class Miner extends Operator implements UIManager.TextCommands {
 
 
 
-    public boolean itemListShouldUpdate;
+    public boolean miningInformationShouldRebuild;
     public boolean activeTargetNode;
     public void prePaint(Graphics g) {
         if (targetNode != null) {
@@ -214,9 +214,9 @@ public class Miner extends Operator implements UIManager.TextCommands {
     }
 
     public void drawMiningInformation(Graphics g) {
-        if (itemListShouldUpdate) {
+        if (miningInformationShouldRebuild) {
             rebuildMiningInformation(g);
-            itemListShouldUpdate = false;
+            miningInformationShouldRebuild = false;
         }
 
         if (oreCollection != null && !oreCollection.isEmpty()) {
@@ -286,7 +286,7 @@ public class Miner extends Operator implements UIManager.TextCommands {
         GameObject winningOre = findWinningOre();
 
         targetNode = winningOre;
-        itemListShouldUpdate = true;
+        miningInformationShouldRebuild = true;
         uiHoldTime = 0;
 
         if (targetNode.interact("Mine")) {
