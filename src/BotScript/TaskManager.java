@@ -18,6 +18,7 @@ public class TaskManager extends TaskScript {
     public Banker banker;
     public Decider decider;
     public Positioner positioner;
+    public DwarvenHustler dwarvenHustler;
     TaskManager(UIManager uiManager) {
         this.uiManager = uiManager;
 
@@ -41,6 +42,8 @@ public class TaskManager extends TaskScript {
             decider = null;
         }else if (operator == positioner) {
             positioner = null;
+        }else if (operator == dwarvenHustler) {
+            dwarvenHustler = null;
         }
     }
 

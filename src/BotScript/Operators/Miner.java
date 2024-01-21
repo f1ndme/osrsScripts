@@ -138,7 +138,7 @@ public class Miner extends Operator implements UIManager.TextCommands {
     }
 
     public void targetObjectChanged(GameObject last, GameObject current) {
-        log("Target object changed!");
+        //log("Target object changed!");
     }
     GameObject lastTargetObject; //not used.
     long timeToBounce = 0;

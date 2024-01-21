@@ -45,6 +45,10 @@ public class Banker extends Operator implements UIManager.TextCommands {
             return false;
         }
 
+        if (taskManager.dwarvenHustler != null) {
+            return false;
+        }
+
         return true;
     }
 
@@ -105,7 +109,7 @@ public class Banker extends Operator implements UIManager.TextCommands {
         Sleep.sleepUntil(this::playerNotMoving, 1801);
         //slept until stopped moving...
 
-        log("We should be standing still, with bank screen open now. Waiting a second...");
+        //log("We should be standing still, with bank screen open now. Waiting a second...");
         Sleep.sleep(Calculations.random(801, 1201));
 
         if (toBank == null) {
@@ -119,7 +123,6 @@ public class Banker extends Operator implements UIManager.TextCommands {
             Sleep.sleepUntil(Bank::close, 2401);
 
             if (!Bank.isOpen()) {
-                log("Banker removed.");
                 taskManager.removeOperator(this);
             }
 

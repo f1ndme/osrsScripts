@@ -13,7 +13,7 @@ import static BotScript.Operators.Operator.States.*;
 import static BotScript.Operators.Operator.States.WAITING;
 
 public class Positioner extends Operator implements UIManager.TextCommands {
-    public Positioner(UIManager uiManager, TaskManager taskManager) {
+    public Positioner(UIManager uiManager, TaskManager taskManager, TaskManager.Locations... locationArgs) {
         this.uiManager = uiManager;
         this.taskManager = taskManager;
 
@@ -21,6 +21,12 @@ public class Positioner extends Operator implements UIManager.TextCommands {
         setCurrentState(WAITING);
         notifier.text = "(Positioner)";
         notifier.y = Client.getViewportHeight() - 215;
+
+        if (locationArgs.length > 0) {
+            TaskManager.Locations goalLocation = locationArgs[0];
+            targetLocation = goalLocation;
+            targetTile = goalLocation.area.getCenter().getTile();
+        }
     }
 
 
@@ -29,7 +35,12 @@ public class Positioner extends Operator implements UIManager.TextCommands {
     @Override
     public boolean accept() {
         if (taskManager.miner.currentState == NOMINABLE && taskManager.banker == null) {
-            executionState = NOMINABLE;
+            executionState = NOMINABLE; //random no minable around us.
+            return true;
+        }
+
+        if (taskManager.miner.currentState == WAITING && taskManager.banker == null) {
+            executionState = NOMINABLE; //put us back mining after cave sell
             return true;
         }
 
@@ -59,16 +70,18 @@ public class Positioner extends Operator implements UIManager.TextCommands {
     }
 
     public Tile targetTile;
+    public TaskManager.Locations targetLocation;
     @Override
     public int execute() {
         setCurrentState(OPERATING);
 
         if (executionState == NOMINABLE) {
             if (targetTile == null) {
-                targetTile = TaskManager.Locations.random().area.getCenter().getTile();
+                targetLocation = TaskManager.Locations.random();
+                targetTile = targetLocation.area.getCenter().getTile();
             }
 
-            Sleep.sleepUntil(this::arrivedAtTarget,()->{Player pll = Players.getLocal(); return pll != null && pll.exists() && pll.isMoving();}, 1801, 300);
+            Sleep.sleepUntil(this::arrivedAtTarget, this::playerStartedMoving, 1801, 300);
 
             if (arrivedAtTarget()) {
                 taskManager.removeOperator(this);
