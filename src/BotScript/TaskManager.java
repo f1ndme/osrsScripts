@@ -1,9 +1,6 @@
 package BotScript;
 
-import BotScript.Operators.Banker;
-import BotScript.Operators.Miner;
-import BotScript.Operators.Operator;
-import BotScript.Operators.Positioner;
+import BotScript.Operators.*;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.methods.skills.Skills;
@@ -17,17 +14,34 @@ import java.util.List;
 
 public class TaskManager extends TaskScript {
     public UIManager uiManager;
-    public Positioner positioner;
     public Miner miner;
     public Banker banker;
+    public Decider decider;
+    public Positioner positioner;
     TaskManager(UIManager uiManager) {
         this.uiManager = uiManager;
 
-        positioner = new Positioner(this, uiManager);
-        miner = new Miner(this, uiManager);
-        banker = new Banker(this, uiManager);
+        miner = new Miner(uiManager, this);
 
-        addNodes(miner, banker, positioner);
+        decider = new Decider(uiManager, this);
+
+        addNodes(miner, decider);
+    }
+
+    public void removeOperator(Operator operator) {
+        if (uiManager.allDualTexts.contains(operator.notifier)) {
+            uiManager.allDualTexts.remove(operator.notifier);
+        }
+        removeNodes((TaskNode)operator);
+        if (operator == banker) {
+            banker = null; //do TaskManager like UIManager where we keep grouped references so we dont have to do manually like this.
+        }else if (operator == miner) {
+            miner = null;
+        }else if (operator == decider) {
+            decider = null;
+        }else if (operator == positioner) {
+            positioner = null;
+        }
     }
 
 
@@ -42,8 +56,6 @@ public class TaskManager extends TaskScript {
         prePaint(g);
         paint(g);
         postPaint(g);
-
-        //drawOperatingTasks(g);
     }
 
     public void prePaint(Graphics g) {

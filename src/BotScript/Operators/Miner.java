@@ -1,415 +1,270 @@
 package BotScript.Operators;
 
-import BotScript.Elements.DualText;
 import BotScript.TaskManager;
 import BotScript.UIManager;
 import org.dreambot.api.Client;
-import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.container.impl.Inventory;
+import org.dreambot.api.methods.container.impl.equipment.Equipment;
 import org.dreambot.api.methods.interactive.GameObjects;
 import org.dreambot.api.methods.interactive.Players;
 import org.dreambot.api.methods.map.Tile;
+import org.dreambot.api.methods.skills.Skill;
+import org.dreambot.api.methods.skills.Skills;
 import org.dreambot.api.utilities.Sleep;
 import org.dreambot.api.wrappers.interactive.GameObject;
+import org.dreambot.api.wrappers.interactive.Player;
 import org.dreambot.api.wrappers.items.Item;
+import org.dreambot.api.wrappers.map.TileReference;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
+import static BotScript.Operators.Operator.States.*;
+
 public class Miner extends Operator implements UIManager.TextCommands {
-    public TaskManager taskManager;
-    public GameObject targetNode;
-    public int reachDistance = 14;
-    public long nextBounce = 0;
-    public long bounceDelay = 60000;
-    public UIManager uiManager;
-    public Miner(TaskManager taskManager, UIManager uiManager) {
-        this.taskManager = taskManager;
+    public Miner(UIManager uiManager, TaskManager taskManager) {
         this.uiManager = uiManager;
+        this.taskManager = taskManager;
 
-        generateMiningInformation();
+        reachDistance = 9;
+
+        fillAllTypes();
+        fillAllMinableTypes();
+
+        buildTextNotifier(this, uiManager);
+        setCurrentState(WAITING);
+        notifier.text = "(MINER)";
+        notifier.y = Client.getViewportHeight() - 200;
     }
+    public int reachDistance;
+    public String[] allTypes;
+    public String[] allMinableTypes;
+    public GameObject targetObject;
 
 
-
-
-
-    public ArrayList<String> allNodes;
-    public ArrayList<DualText> allNodeDualTexts;
-    public ArrayList<String> accessibleNodes;
-    public ArrayList<String> exclusionList;
-    public Hashtable<TaskManager.Ores, Integer> oreCollection;
-    public void generateMiningInformation() {
-        allNodes = new ArrayList<>();
-        allNodeDualTexts = new ArrayList<>();
-        accessibleNodes = new ArrayList<>();
-        exclusionList = new ArrayList<>();
-        oreCollection = new Hashtable<>();
-
-        for (TaskManager.Ores ore : TaskManager.Ores.values()) {
-            allNodes.add(ore.name);
-
-            oreCollection.put(ore, 0);
-
-            allNodeDualTexts.add(uiManager.DualText(ore.name, "", 0, 0, Color.white, Color.white, this)); //no handle for deletion?
+    public GameObject objectFrom(Tile tile) {
+        TileReference tileReference = tile.getTileReference();
+        if (tileReference == null || tileReference.getObjects().length == 0) {
+            return null;
         }
 
-        for (TaskManager.Ores ore : TaskManager.Ores.allMinable()) {
-            accessibleNodes.add(ore.name);
-        }
-
-        miningInformationShouldRebuild = true;
+        return tileReference.getObjects()[0];
     }
-
-
-
-
-
-
-
-
-
-    int totalCollectedOres;
-    long uiHoldTime;
-    String lastGrab;
-    public void onInventoryItemAdded(Item pickupItem) {
-        totalCollectedOres = 0; //update collected items total.
-        for (Integer myCount : oreCollection.values()) {
-            totalCollectedOres = totalCollectedOres + myCount;
-        }
-
-        for (TaskManager.Ores ore : TaskManager.Ores.values()) { //change to items, and to real item names.
-            String oreFirstName = ore.name.split(" ", 2)[0];
-
-            if (pickupItem.getName().contains(oreFirstName)) {
-                oreCollection.put(ore, oreCollection.get(ore) + 1);
-
-                uiHoldTime = System.currentTimeMillis() + 2000;
-                lastGrab = ore.name.split(" ", 2)[0];
+    public GameObject furthestReachable() {
+        double winning = 0;
+        GameObject winner = null;
+        for (GameObject object : minableReachable()) {
+            if (object.distance(Players.getLocal().getTile()) > winning) {
+                winning = object.distance(Players.getLocal().getTile());
+                winner = object;
             }
         }
 
-        miningInformationShouldRebuild = true;
+        return winner;
     }
-
-    public void onTextCommandPressed(int id) {}
-    public void onDualTextPressed(int id) {
-        if (!exclusionList.contains(uiManager.allDualTexts.get(id).text)) {
-            exclusionList.add(uiManager.allDualTexts.get(id).text);
-        }else {
-            exclusionList.remove(uiManager.allDualTexts.get(id).text);
-        }
-
-        miningInformationShouldRebuild = true;
-    }
-
-
-
-
-
-
-    public boolean miningInformationShouldRebuild;
-    public boolean activeTargetNode;
-    public void prePaint(Graphics g) {
-        if (targetNode != null) {
-            activeTargetNode = true;
-        }
-    }
-    public void paint(Graphics g) {
-        drawMiningInformation(g);
-    }
-    public void postPaint(Graphics g) {
-        activeTargetNode = false;
-    }
-
-
-
-
-
-
-
-
-
-    public int MiningInformationXOrigin = -1;
-    public int MiningInformationYOrigin = -1;
-    public void rebuildMiningInformation(Graphics g) {
-        if (MiningInformationXOrigin == -1) { //fix sometime.
-            MiningInformationXOrigin = 5;
-            MiningInformationYOrigin = Client.getViewportHeight()-185;
-        }
-
-        int i=0;
-        for (String itemName : allNodes) {
-            Font lastfont = g.getFont();
-            g.setFont(allNodeDualTexts.get(i).font); //set font for metrics. idk if we need this
-            FontMetrics metrics = g.getFontMetrics();
-            int fontHeight = metrics.getFont().getSize();
-
-            if (allNodeDualTexts.get(i).x != MiningInformationXOrigin) {
-                allNodeDualTexts.get(i).x = MiningInformationXOrigin;
+    public GameObject closestReachable() {
+        double winning = 100000;
+        GameObject winner = null;
+        for (GameObject object : minableReachable()) {
+            if (object.distance(Players.getLocal().getTile()) < winning) {
+                winning = object.distance(Players.getLocal().getTile());
+                winner = object;
             }
-            if (allNodeDualTexts.get(i).y != MiningInformationYOrigin - i*fontHeight) {
-                allNodeDualTexts.get(i).y = MiningInformationYOrigin - i*fontHeight;
-            }
-            g.setFont(lastfont);
+        }
 
-            if (oreCollection != null && !oreCollection.isEmpty()) { //fix this.
-                for (TaskManager.Ores ore : TaskManager.Ores.values()) {
-                    if (ore.name.contains(itemName.split(" ", 2)[0])) {
-                        if (oreCollection.containsKey(ore)) {
-                            int count = oreCollection.get(ore);
-                            String name = ore.name.split(" ", 2)[0];
-                            if (count > 0) {
-                                allNodeDualTexts.get(i).textTwo = " x" + count;
-                            }
+        return winner;
+    }
+    public List<GameObject> minableReachable() {
+        List<GameObject> newList = new ArrayList<>();
 
-                            if (lastGrab != null) {
-                                if (name.contains(lastGrab) && Calculations.isBefore(uiHoldTime)) {
-                                    if (allNodeDualTexts.get(i).colorTwo != Color.green) {
-                                        allNodeDualTexts.get(i).colorTwo = Color.green;
-                                    }
-                                }else {
-                                    if (allNodeDualTexts.get(i).colorTwo != Color.white) {
-                                        allNodeDualTexts.get(i).colorTwo = Color.white;
-                                    }
-                                }
-                            }
-
-                        }
-                    }
+        for (GameObject object : allReachable()) {
+            for (int i=0; i < allMinableTypes.length; i++) {
+                if (object.getName().equals(allMinableTypes[i])) {
+                    newList.add(object);
                 }
             }
-
-            if (activeTargetNode) {
-                if (itemName.equalsIgnoreCase(targetNode.getName())) {
-                    if (allNodeDualTexts.get(i).color != Color.green) {
-                        allNodeDualTexts.get(i).color = Color.green;
-                    }
-                }else {
-                    if (allNodeDualTexts.get(i).color != Color.white) {
-                        allNodeDualTexts.get(i).color = Color.white;
-                    }
-                }
-            }else {
-                if (allNodeDualTexts.get(i).color != Color.white) {
-                    allNodeDualTexts.get(i).color = Color.white;
-                }
-            }
-
-            if (!accessibleNodes.contains(itemName)) { //skill level says no
-                if (allNodeDualTexts.get(i).color != Color.darkGray) {
-                    allNodeDualTexts.get(i).color = Color.darkGray;
-                }
-            }
-
-            if (exclusionList.contains(itemName)) { //Client says no
-                if (allNodeDualTexts.get(i).color != Color.pink) {
-                    allNodeDualTexts.get(i).color = Color.pink;
-                }
-            }
-            i++;
         }
+
+        return newList;
     }
-
-    public void drawMiningInformation(Graphics g) {
-        if (miningInformationShouldRebuild) {
-            rebuildMiningInformation(g);
-            miningInformationShouldRebuild = false;
-        }
-
-        if (oreCollection != null && !oreCollection.isEmpty()) {
-            g.setColor(Color.white);
-            g.drawString("Ores(Collected: " + totalCollectedOres + ")", 5, Client.getViewportHeight() - (185 + (allNodeDualTexts.getFirst().font.getSize() * allNodes.size())));
-        }else {
-            g.setColor(Color.white);
-            g.drawString("Ores(Collected: 0):", 5, Client.getViewportHeight() - (185 + (allNodeDualTexts.getFirst().font.getSize() * allNodes.size())));
-        }
+    public List<GameObject> allReachable() {
+        return GameObjects.all(object -> object.hasAction("Mine") && object.distance(Players.getLocal().getTile()) <= reachDistance && object.getModelColors() != null);
     }
-
-
-
-
-
-
-
-
-
-
-
-
+    public boolean containsPickaxe() {
+        return Inventory.contains(item -> item.getName().contains("pickaxe")) || Equipment.contains(item -> item.getName().contains("pickaxe"));
+    }
 
     @Override
     public boolean accept() {
-        if (Players.getLocal() == null) {
-            return false;
-        }
+        Player pl = Players.getLocal();
+        Tile plTile = pl.getTile();
 
-        if (!Players.getLocal().exists()) {
-            return false;
+        if (!pl.exists()) {
+            setCurrentState(PLAYEREXIST);
+            return false; //player does not exist.
         }
-
-        if (!taskManager.positioner.alreadyArrived) {
+        if (taskManager.positioner != null || taskManager.banker != null) {
             return false;
         }
 
         if (Inventory.isFull()) {
-            return false;
+            setCurrentState(FULLINVENTORY);
+            return false; //inventory is full.
+        }
+        if (!containsPickaxe()) {
+            setCurrentState(NOPICKAXE);
+            return false; //no pickaxe.
+        }
+        if (pl.isMoving()) {
+            setCurrentState(STILLMOVING);
+            return false; //dont mine while running.
+        }
+        if (targetObject != null && plTile != null && targetObject.distance(plTile) > reachDistance) {
+            targetObject = null;
+            targetTile = null;
+            setCurrentState(TOOFAR);
+            return false; //valid retry, but object might be too far, so return false.
         }
 
-        if (Players.getLocal().isMoving()) {
-            return false;
+        if (minableReachable().isEmpty()) {
+            setCurrentState(NOMINABLE);
+            return false; //no minable ores within reach.
         }
-
-        if (getReachable().isEmpty()) {
-            return false;
-        }
-
-        if (isNodeRocks()) {
-            return true;
-        }
-
-        if (Players.getLocal().isAnimating()) {
-            return false;
-        }
-
-        if (getReachable().isEmpty()) {
-            return false; //NEW if problems. start here.
-        }
+        //Now we have, a valid player, with a pickaxe, standing still, with minable ores within reach.
+        setCurrentState(ATTEMPTING);
 
         return true;
     }
 
+    public void targetObjectChanged(GameObject last, GameObject current) {
+        log("Target object changed!");
+    }
+    GameObject lastTargetObject; //not used.
+    long timeToBounce = 0;
+    public Tile targetTile;
     @Override
     public int execute() {
-        GameObject winningOre = findWinningOre();
+        Player pl = Players.getLocal();
+        if (!pl.exists()) {
+            log("Null player");
+            return 100;
+        }
 
-        targetNode = winningOre;
-        miningInformationShouldRebuild = true;
-        uiHoldTime = 0;
+        if (targetObject != null && targetObject.exists()) {
+            if (lastTargetObject == null) {
+                lastTargetObject = targetObject;
+            }else {
+                if (lastTargetObject != targetObject) {
+                    targetObjectChanged(lastTargetObject, targetObject);
+                    lastTargetObject = targetObject;
+                }else {
+                    log("Mining: retry attempt on target object.");
+                }
+            }
+        }else {
+            targetObject = closestReachable();
+            targetTile = targetObject.getTile();
 
-        if (targetNode.interact("Mine")) {
-            Sleep.sleepUntil(this::playerAnimating, this::playerMoving, 1201, 300);
+            if (System.currentTimeMillis() > timeToBounce) {
+                timeToBounce = System.currentTimeMillis() + 60000;
 
-            Sleep.sleepUntil(this::isNodeRocks, 1500);
+                targetObject = furthestReachable();
+                targetTile = targetObject.getTile();
+            }
+        }
+
+        if (targetObject.interact("Mine")) {
+            if (!pl.isMoving()) { //sleep till moving, if started not moving. stops spam click.
+                Sleep.sleepUntil(this::playerStartedMoving, 1801);
+            }
+
+            Sleep.sleepUntil(this::deadRock, this::resetIfAttempting, 1801, 301); //handle connect stops animating, here.
         }
 
         return 100;
     }
+    public boolean resetIfAttempting() {
+        Player pl = Players.getLocal();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public List<GameObject> getReachable() {
-        List<GameObject> reachable = new ArrayList<>();
-
-        for (GameObject object : GameObjects.all(object -> object.hasAction("Mine") && object.distance(Players.getLocal().getTile()) <= reachDistance && object.getModelColors() != null)) {
-            for (TaskManager.Ores ore : TaskManager.Ores.allMinable()) {
-                if (!exclusionList.contains(ore.name)) {
-                    if (ore.name.equals(object.getName())) {
-                        reachable.add(object);
-                    }
-                }
+        if (pl.exists()) {
+            if (pl.isAnimating() || pl.isMoving()) {
+                return true;
             }
         }
 
-        return reachable;
+        return false;
     }
+    public boolean deadRock() {
+        Player pl = Players.getLocal();
+        GameObject objectFrom = objectFrom(targetTile);
 
-    public GameObject randomReachable() {
-        if (getReachable().isEmpty()) {
-            return null;
+        if (targetTile == null || objectFrom == null || objectFrom.getName().equals("Rocks") ) {
+            targetObject = null;
+            targetTile = null;
+            return true;
         }
 
-        return getReachable().get(Calculations.random(0, getReachable().size()));
-    }
-    public GameObject closestReachable() {
-        if (getReachable().isEmpty()) {
-            return null;
-        }
-
-        GameObject winningObject = null;
-        double winner = 1000000;
-
-        for (GameObject obj : getReachable()) {
-            if (obj.distance(Players.getLocal().getTile()) < winner) {
-                winner = obj.distance(Players.getLocal().getTile());
-                winningObject = obj;
+        if (pl != null && pl.exists() && pl.isAnimating()) {
+            if (currentState != MINING) {
+                setCurrentState(MINING);
             }
         }
 
-        return winningObject;
+        return false;
+    }
+    public void onInventoryItemAdded(Item item) {
+        //log(item.getName() + " added to inventory!");
     }
 
-    public GameObject findWinningOre() {
-        GameObject winningObject = closestReachable();
+    public void prePaint(Graphics g) {
 
-        if (nextBounce < System.currentTimeMillis()) {
-            nextBounce = System.currentTimeMillis() + bounceDelay;
-
-            winningObject = randomReachable();
-        }
-
-        return winningObject;
     }
 
-    public boolean playerMoving() {
-        if (Players.getLocal() == null) { //True on null, to ignore connection error.
-            log("Player is null");
-            return true;
-        }
+    public void paint(Graphics g) {
 
-        if (!Players.getLocal().exists()) { //True on null, to ignore connection error.
-            log("Player does not exist");
-            return true;
-        }
-
-        return Players.getLocal().isMoving();
     }
 
-    public boolean playerAnimating() {
-        if (Players.getLocal() == null) { //True on null, to ignore connection error.
-            log("Player is null");
-            return true;
-        }
+    public void postPaint(Graphics g) {
 
-        if (!Players.getLocal().exists()) { //True on null, to ignore connection error.
-            log("Player does not exist");
-            return true;
-        }
-
-        return Players.getLocal().isAnimating();
     }
 
 
-    public GameObject objectFrom(Tile tile) {
-        if (tile.getTileReference() == null) {
-            return null;
+
+
+
+
+
+
+
+
+
+    public void fillAllTypes() {
+        allTypes = new String[TaskManager.Ores.values().length];
+
+        int i=0;
+        for (TaskManager.Ores ore : TaskManager.Ores.values()) {
+            allTypes[i] = ore.name;
+
+            i++;
+        }
+    }
+    public void fillAllMinableTypes() {
+        int count=0;
+        for (TaskManager.Ores ore : TaskManager.Ores.values()) {
+            if (ore.level <= Skills.getRealLevel(Skill.MINING)) {
+                count++;
+            }
         }
 
-        if (tile.getTileReference().getObjects().length == 0) {
-            return null;
+        allMinableTypes = new String[count];
+
+        int i=0;
+        for (TaskManager.Ores ore : TaskManager.Ores.values()) {
+            if (ore.level <= Skills.getRealLevel(Skill.MINING)) {
+                allMinableTypes[i] = ore.name;
+                i++;
+            }
         }
-
-        return tile.getTileReference().getObjects()[0];
     }
-
-    public boolean isNodeRocks() {
-        return targetNode == null || targetNode.getTile() == null || objectFrom(targetNode.getTile()) == null || objectFrom(targetNode.getTile()).getName().equals("Rocks");
-    }
-
 }
