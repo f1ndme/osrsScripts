@@ -17,12 +17,12 @@ public class TaskManager extends TaskScript implements Miner.MinerInterface {
         this.uiManager = uiManager;
 
         miner = new Miner(uiManager, this);
-        woodCutter = new WoodCutter(uiManager, this);
-        smelter = new Smelter(uiManager, this);
+        //woodCutter = new WoodCutter(uiManager, this);
+        //smelter = new Smelter(uiManager, this);
 
         //decider = new Decider(uiManager, this);
 
-        addNodes(smelter); //miner, woodCutter
+        addNodes(miner); //miner, woodCutter
     }
 
     public void onFullInventory() {
