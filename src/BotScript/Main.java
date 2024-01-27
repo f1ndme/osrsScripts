@@ -1,8 +1,11 @@
 package BotScript;
 
+import org.dreambot.api.methods.container.impl.Shop;
 import org.dreambot.api.script.AbstractScript;
 import org.dreambot.api.script.Category;
 import org.dreambot.api.script.ScriptManifest;
+import org.dreambot.api.script.event.impl.ExperienceEvent;
+import org.dreambot.api.script.listener.ExperienceListener;
 import org.dreambot.api.script.listener.HumanMouseListener;
 import org.dreambot.api.script.listener.ItemContainerListener;
 import org.dreambot.api.wrappers.items.Item;
@@ -11,7 +14,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 @ScriptManifest(category = Category.UTILITY, name = "Bot Script", description = "It does cool stuff.", author = "find me", version = 1.0)
-public class Main extends AbstractScript implements HumanMouseListener, ItemContainerListener {
+public class Main extends AbstractScript implements HumanMouseListener, ItemContainerListener, ExperienceListener {
 
     public UIManager uiManager;
     public TaskManager taskManager;
@@ -27,6 +30,7 @@ public class Main extends AbstractScript implements HumanMouseListener, ItemCont
     }
 
     public void think() {
+
         if (uiManager != null) {
             uiManager.think();
         }
@@ -65,4 +69,5 @@ public class Main extends AbstractScript implements HumanMouseListener, ItemCont
     public void onInventoryItemAdded(Item item) {
         taskManager.onInventoryItemAdded(item);
     }
+    public void onLevelUp(ExperienceEvent event) {taskManager.onLevelUp(event);}
 }
