@@ -11,7 +11,7 @@ public class UIManager {
     public ArrayList<TextCommand> allTextCommands;
     public ArrayList<DualText> allDualTexts;
     public Vector2D mousePosition;
-    UIManager() {
+    public UIManager() {
         this.allTextCommands = new ArrayList<>();
         this.allDualTexts = new ArrayList<>();
 

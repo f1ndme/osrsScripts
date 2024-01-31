@@ -29,8 +29,8 @@ public class WoodCutter extends Operator implements UIManager.TextCommands {
         buildHighestUsableAxeEnum();
     }
 
-    public List<String> usableAxeNames; //todo GOOD
-    public void buildUsableAxeNames() { //todo STRING Names List
+    public List<String> usableAxeNames;
+    public void buildUsableAxeNames() { //todo Names List
         usableAxeNames = new ArrayList<>();
 
         for (Items axe : Items.values()) {
@@ -41,8 +41,8 @@ public class WoodCutter extends Operator implements UIManager.TextCommands {
             }
         }
     }
-    public List<Items> usableAxeEnums; //todo GOOD
-    public void buildUsableAxeEnums() { //todo ENUM List
+    public List<Items> usableAxeEnums;
+    public void buildUsableAxeEnums() { //todo Enums List
         usableAxeEnums = new ArrayList<>();
 
         for (Items axe : Items.values()) {
@@ -53,8 +53,8 @@ public class WoodCutter extends Operator implements UIManager.TextCommands {
             }
         }
     }
-    Items highestUsableAxeEnum; //todo GOOD I THINK
-    public void buildHighestUsableAxeEnum() { //todo ENUM
+    Items highestUsableAxeEnum;
+    public void buildHighestUsableAxeEnum() { //todo Enum
 
         int winning = 0;
         Items winner = Items.BRONZEAXE;
