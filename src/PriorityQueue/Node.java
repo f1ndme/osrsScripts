@@ -18,6 +18,7 @@ public class Node {
     public LinkedList<Integer> children;
 
 
+
     public Node(Integer priority, Node... tree) {
         this.tree = (tree.length>0)? tree[0] : null;
         this.priority = priority;

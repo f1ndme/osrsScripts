@@ -13,19 +13,22 @@ public class TaskBase implements HumanMouseListener {
         this.mousePosition = mousePosition;
     }
     Vector2D mousePosition;
-    public LinkedList<EventBase> events;
+    public LinkedList<EventBase> taskEvents;
     public TaskBase() {
-        events = new LinkedList<>();
+        taskEvents = new LinkedList<>();
     }
 
 
+    public boolean hasTaskEvents() {
+        return taskEvents != null && !taskEvents.isEmpty();
+    }
 
     public int onLoop() {
-        if (events == null || events.isEmpty()) return 100;
+        if (!hasTaskEvents()) return 100;
 
-        if (!events.getFirst().operating()) {
-            if (events == null || events.isEmpty()) return 100; //an event might come in late on sleep, an its already removed.
-            removeEvent(events.getFirst());
+        if (!taskEvents.getFirst().operating()) {
+            if (taskEvents == null || taskEvents.isEmpty()) return 100; //an event might come in late on sleep, an its already removed.
+            removeEvent(taskEvents.getFirst());
         }
 
         return 100;
@@ -36,14 +39,14 @@ public class TaskBase implements HumanMouseListener {
 
     public void addEvent(EventBase event) {
         log("(" + event.getClass().getSimpleName() + ") event has been added.");
-        events.add(event);
+        taskEvents.add(event);
     }
 
     public void removeEvent(EventBase event) {
         log("(" + event.getClass().getSimpleName() + ") event has been removed.");
 
         event.clearOperators();
-        events.remove(event);
+        taskEvents.remove(event);
     }
 
 
@@ -56,8 +59,8 @@ public class TaskBase implements HumanMouseListener {
             think();
         }
 
-        if (!events.isEmpty()) {
-            events.getFirst().onPaint(g, mousePosition); //paint just the first event of a task.
+        if (!taskEvents.isEmpty()) {
+            taskEvents.getFirst().onPaint(g, mousePosition); //paint just the first event of a task.
         }
     }
 }

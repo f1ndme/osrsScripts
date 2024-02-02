@@ -32,36 +32,36 @@ public class MiningTask extends TaskBase {
 
     public void think() {
         if (Inventory.isFull()) {
-            if (!events.contains(bankOresEvent)) {
+            if (!taskEvents.contains(bankOresEvent)) {
                 bankOresEvent = new BankOres();
                 addEvent(bankOresEvent);
             }
         }else { //todo. Inventory has space
             if (hasPickaxe()) {
-                if (events.contains(collectPickaxeEvent)) {
+                if (taskEvents.contains(collectPickaxeEvent)) {
                     removeEvent(collectPickaxeEvent);
                 }
 
-                if (!minableReachable().isEmpty() && !events.contains(findOresEvent)) { //dont try mine en-route to location.
-                    if (!events.contains(collectOresEvent)) {
+                if (!minableReachable().isEmpty() && !taskEvents.contains(findOresEvent)) { //dont try mine en-route to location.
+                    if (!taskEvents.contains(collectOresEvent)) {
                         collectOresEvent = new CollectOres();
                         addEvent(collectOresEvent);
                     }
                 }else { //todo. No Reachable Ores
-                    if (!events.contains(findOresEvent)) {
+                    if (!taskEvents.contains(findOresEvent)) {
                         findOresEvent = new FindOres();
                         addEvent(findOresEvent);
                     }
                 }
             }else { //todo. No Pickaxe
-                if (!events.contains(collectPickaxeEvent)) {
+                if (!taskEvents.contains(collectPickaxeEvent)) {
                     collectPickaxeEvent = new CollectPickaxe();
                     addEvent(collectPickaxeEvent);
                 }
-                if (events.contains(collectOresEvent)) {
+                if (taskEvents.contains(collectOresEvent)) {
                     removeEvent(collectOresEvent);
                 }
-                if (events.contains(findOresEvent)) {
+                if (taskEvents.contains(findOresEvent)) {
                     removeEvent(findOresEvent);
                 }
             }

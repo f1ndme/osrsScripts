@@ -7,7 +7,12 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+
+
 public class UIManager {
+    private static final Font defaultFont = new Font("Default", Font.PLAIN, 12);
+    private static final Color defaultColor = new Color(255, 255, 255, 255);
+
     public ArrayList<TextCommand> allTextCommands;
     public ArrayList<DualText> allDualTexts;
     public Vector2D mousePosition;
@@ -52,14 +57,14 @@ public class UIManager {
 
 
     public DualText DualText(String text, String textTwo, int x, int y, Color color, Color colorTwo, TextCommands receiver) {
-        DualText newDualText = new DualText(text, textTwo, x, y, new Font("Default", Font.PLAIN, 12), color, colorTwo, receiver, allDualTexts.size(), this);
+        DualText newDualText = new DualText(text, textTwo, x, y, defaultFont, color, colorTwo, receiver, allDualTexts.size(), this);
 
         allDualTexts.add(newDualText);
 
         return newDualText;
     }
     public TextCommand TextCommand(String text, int x, int y, TextCommands receiver) {
-        TextCommand newTextCommand = new TextCommand(text, x, y, new Font("Default", Font.PLAIN, 12), new Color(255, 255, 255, 255), receiver, allTextCommands.size(), this);
+        TextCommand newTextCommand = new TextCommand(text, x, y, defaultFont, defaultColor, receiver, allTextCommands.size(), this);
 
         allTextCommands.add(newTextCommand);
 

@@ -24,12 +24,16 @@ public class GoTo extends OperatorBase {
         super.locationName = bankLocation.name();
     }
 
-
     public boolean operating() {
         if (!arrivedAtLocation()) return true;
 
         return false;
     }
+
+
+
+
+
 
     public boolean arrivedAtLocation() {
         if (location == null) return true; //die if no location.

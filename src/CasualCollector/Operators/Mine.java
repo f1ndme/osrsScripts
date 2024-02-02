@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Mine extends OperatorBase {
-
     GameObject targetObject;
     Tile targetTile;
     public Mine() {
@@ -25,19 +24,6 @@ public class Mine extends OperatorBase {
         this.targetTile = targetObject.getTile();
 
         super.locationName = targetObject.getName();
-    }
-
-    public List<String> minableRockNames;
-    public void buildMinableRockNames() {
-        minableRockNames = new ArrayList<>();
-
-        for (Operator.Objects rock : Operator.Objects.values()) {
-            if (rock.name.contains("rocks")) {
-                if (rock.requiredLevel <= Skills.getRealLevel(Skill.MINING)) {
-                    minableRockNames.add(rock.name);
-                }
-            }
-        }
     }
 
     public boolean operating() {
@@ -61,8 +47,18 @@ public class Mine extends OperatorBase {
 
 
 
+    public List<String> minableRockNames;
+    public void buildMinableRockNames() {
+        minableRockNames = new ArrayList<>();
 
-
+        for (Operator.Objects rock : Operator.Objects.values()) {
+            if (rock.name.contains("rocks")) {
+                if (rock.requiredLevel <= Skills.getRealLevel(Skill.MINING)) {
+                    minableRockNames.add(rock.name);
+                }
+            }
+        }
+    }
 
     public java.util.List<GameObject> allReachable() {
         return GameObjects.all(object -> object.hasAction("Mine") && object.distance(Players.getLocal().getTile()) <= 9 && object.getModelColors() != null);

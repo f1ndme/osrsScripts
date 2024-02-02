@@ -15,25 +15,43 @@ public class CheckPickupGroundItem extends OperatorBase {
         super.locationName = itemName; //lol
     }
 
-
     public boolean operating() {
         List<GroundItem> groundItems = GroundItems.all(groundItem -> groundItem.getItem().getName().equals(itemName));
 
-        if (!groundItems.isEmpty() && groundItems.getFirst().exists()) {
+        if (isValidList(groundItems)) {
             GroundItem itemToTake = groundItems.getFirst();
 
-            if (itemToTake.exists()) {
-                Sleep.sleepUntil(()->itemToTake.interact("Take"), 2401);
-                if ( playerNotMoving() ) {Sleep.sleepUntil(this::playerMoving, 1201);}
-                Sleep.sleepUntil(this::playerNotMoving, this::playerMoving, 1801, 300);
-
+            if (isValidItem(itemToTake)) {
+                sleepUntilItemTaken(itemToTake);
+                if ( playerNotMoving() ) sleepUntilPlayerMoves();
+                sleepUntilPlayerStops();
             }
         }
 
-        if (Inventory.contains(itemName)) {
-            return false;
-        }
+        return !Inventory.contains(itemName);
+    }
 
-        return true;
+
+
+
+
+    private boolean isValidList(List<GroundItem> groundItems) {
+        return !groundItems.isEmpty() && groundItems.getFirst()!= null && groundItems.getFirst().exists();
+    }
+
+    private boolean isValidItem(GroundItem groundItem) {
+        return groundItem != null && groundItem.exists();
+    }
+
+    private void sleepUntilItemTaken(GroundItem itemToTake) {
+        Sleep.sleepUntil(() -> itemToTake.interact("Take"), 2401);
+    }
+
+    private void sleepUntilPlayerMoves() {
+        Sleep.sleepUntil(this::playerMoving, 1201);
+    }
+
+    private void sleepUntilPlayerStops() {
+        Sleep.sleepUntil(this::playerNotMoving, this::playerMoving, 1801, 300);
     }
 }

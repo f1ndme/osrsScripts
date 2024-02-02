@@ -9,55 +9,51 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class EventBase {
-    Color white = new Color(255, 255, 255, 180);
-    Color green = new Color(80, 255, 80, 225);
-    Color lightyellow = new Color(255, 255, 80, 80);
-    Font font = new Font("Default", Font.PLAIN, 12);
+    private static final Color white = new Color(255, 255, 255, 180);
+    private static final Color green = new Color(80, 255, 80, 225);
+    private static final Color yellow = new Color(255, 255, 80, 80);
+    private static final Font defaultFont = new Font("Default", Font.PLAIN, 12);
 
     public LinkedList<OperatorBase> operators;
     OperatorBase currentOperator;
-    DualText EventNotifier;
-    List<DualText> operatorNotifiers;
+    DualText defaultNotification;
+    List<DualText> Notifications;
     public EventBase() {
         operators = new LinkedList<>();
-
-        EventNotifier = new DualText("[" + this.getClass().getSimpleName() + "] ", "Waiting...", 10, 32, font, green, white);
+        defaultNotification = new DualText("[" + this.getClass().getSimpleName() + "] ", "Waiting...", 10, 32, defaultFont, green, white);
+        Notifications = new ArrayList<>();
     }
 
     public void think() {}
 
-    public void rebuildOperatorNotifiers() {
-        if (operators.isEmpty()) {
-            operatorNotifiers.clear();
-            return;
-        }
+    public void rebuildNotifications() {
+        Notifications.clear();
+        if (operators.isEmpty()) return;
 
-        if (operatorNotifiers == null) {
-            operatorNotifiers = new ArrayList<>();
-        }else {
-            operatorNotifiers.clear();
+        defaultNotification.textTwo = operators.size() + " Operation(s) to complete...";
 
-            if (EventNotifier != null) {
-                EventNotifier.textTwo = operators.size() + " Operation(s) to complete...";
-            }
-        }
-
-        int g = 0;
+        int offset = 0;
         for (OperatorBase operator : operators) {
-            if (currentOperator == operator) {
-                operatorNotifiers.add(new DualText("(" + operator.getClass().getSimpleName() + " " + operator.locationName + ") ", "Operating...", 4, 50 + g*15, font, green, white));
-            }else {
-                operatorNotifiers.add(new DualText("(" + operator.getClass().getSimpleName() + " " + operator.locationName + ") ", "", 4, 50 + g*15, font, lightyellow, white));
-            }
-            g++;
+            Notifications.add(createOperatorNotification(offset, operator));
+            offset++;
         }
     }
 
+    private DualText createOperatorNotification(int offset, OperatorBase operator) {
+        String label = "(" + operator.getClass().getSimpleName() + " " + operator.locationName + ") ";
+        String text = currentOperator == operator ? "Operating..." : "";
+        return new DualText(label, text, 4, 50 + offset * 15, defaultFont, green, white);
+    }
+
+    private boolean hasOperators() {
+        return operators != null && !operators.isEmpty();
+    }
+
     public boolean operating() {
-        if (operators == null || operators.isEmpty()) return false;
+        if (!hasOperators()) return false;
 
         if (!operators.getFirst().operating()) {
-            if (operators == null || operators.isEmpty()) return false; //an operator might come in late on sleep, an its already removed.
+            if (!hasOperators()) return false; //an operator might come in late on sleep, an its already removed.
             removeOperator(operators.getFirst());
         }
 
@@ -65,7 +61,7 @@ public class EventBase {
     }
 
     public void operatorChanged() {
-        rebuildOperatorNotifiers();
+        rebuildNotifications();
     }
 
     public void operatorAdded() {
@@ -109,9 +105,9 @@ public class EventBase {
 
 
     public void onPaint(Graphics g, Vector2D mousePosition) { //paint dual texts
-        EventNotifier.onPaint(g, mousePosition);
+        defaultNotification.onPaint(g, mousePosition);
 
-        for (DualText operatorText : operatorNotifiers) {
+        for (DualText operatorText : Notifications) {
             operatorText.onPaint(g, mousePosition);
         }
     }

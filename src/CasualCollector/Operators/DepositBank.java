@@ -10,12 +10,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DepositBank extends OperatorBase {
-
     private final List<Item> typesList;
     public DepositBank(List<Item> itemsList) {
         this.typesList = typesListFrom(itemsList);
         super.locationName = "" + itemsList.size(); //lol
     }
+
+    public boolean operating() {
+        if (!Bank.open()) return false;
+
+        for (Item itemTypeToDeposit : typesList) {
+            if (!Bank.isOpen()) return true;
+
+            Sleep.sleepUntil(()->Bank.depositAll(itemTypeToDeposit), 1801);
+            Sleep.sleep(Calculations.random(201, 401));
+        }
+
+        return true;
+    }
+
+
+
+
 
     public List<Item> typesListFrom(List<Item> itemsList) {
         List<Item> typesList = new ArrayList<>();
@@ -25,22 +41,5 @@ public class DepositBank extends OperatorBase {
             }
         }
         return typesList;
-    }
-
-    public boolean operating() {
-        if (Bank.open()) {
-            Sleep.sleepUntil(Bank::isOpen, 1801);
-
-            for (Item itemTypeToDeposit : typesList) {
-                if (!Bank.isOpen()) return true;
-
-                Sleep.sleepUntil(()->Bank.depositAll(itemTypeToDeposit), 1801);
-                Sleep.sleep(Calculations.random(201, 401));
-            }
-
-            return false;
-        }
-
-        return true;
     }
 }
